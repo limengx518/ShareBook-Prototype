@@ -20,13 +20,22 @@ int main(int argc, char *argv[])
 //    }
 
     JottingSocialControl *jsc = new JottingSocialControl();
-       int account = 3;
+    int account = 3;
 
-       jsc->login(account);
-       jsc->pushJottings();
+    jsc->login(account);
+    jsc->pushJottings();
+    jsc->checkOneJot(2);
 
 //    DataBase *db=DataBase::getInstance();
 //    db->connectDataBase("Netizen");
+//    db->connectDataBase("Comment");
+//    db->connectDataBase("Material");
+//    db->connectDataBase("Relation");
+//    db->connectDataBase("Jotting");
 //    db->showDataBase("Netizen");
+//    db->showDataBase("Comment");
+//    db->showDataBase("Material");
+//    db->showDataBase("Relation");
+//    db->showDataBase("Jotting");
     return a.exec();
 }

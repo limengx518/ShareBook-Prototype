@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     comment.cpp \
+    commentbroker.cpp \
     database.cpp \
     jotting.cpp \
     jottingbroker.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
 
 HEADERS += \
     comment.h \
+    commentbroker.h \
     database.h \
     jotting.h \
     jottingbroker.h \

@@ -17,6 +17,10 @@ public:
     JottingSocialControl();
     void login(int id);
     void pushJottings();
+    void checkOneJot(int index);
+    Jotting *findJot(int index);
+    void commentTheJot(QString content);
+
 private:
     NetizenBroker *nb;
     JottingBroker *jb;
@@ -26,6 +30,7 @@ private:
 
     //Jotting buffer storage in here
     QVector<Jotting* > m_jottings;
+    Jotting* m_scanJotting;
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

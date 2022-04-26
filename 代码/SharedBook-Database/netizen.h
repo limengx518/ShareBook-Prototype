@@ -9,6 +9,7 @@
 
 class MaterialBroker;
 class JottingBroker;
+class Comment;
 
 class Netizen
 {
@@ -29,9 +30,10 @@ public:
     QVector<Netizen*> getInterests();
     void get_Interests_ID_Info();
 
+    void addPostedCom(NetizenBroker* nb,Comment* comment);
     QString getNickname();
 
-    void pushInterestsJotting(NetizenBroker *nb,JottingBroker *jb,MaterialBroker *mb);
+    QVector<Jotting*> pushInterestsJotting(JottingBroker* jb);
 
 private:
     int m_id;
@@ -42,6 +44,7 @@ private:
     QVector<Jotting *> m_jottings;
     QVector<Netizen *> m_fans;
     QVector<Netizen *> m_interests;
+    QVector<Comment*> m_postedComment;
 };
 
 #endif // NETIZEN_H

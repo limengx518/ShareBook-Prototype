@@ -1,6 +1,7 @@
 #include "jottingbroker.h"
 #include "materialbroker.h"
 #include "netizenbroker.h"
+#include "commentbroker.h"
 #include "netizen.h"
 
 #include "jottingsocialcontrol.h"
@@ -8,10 +9,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <QDateTime>
 
 JottingSocialControl::JottingSocialControl(){
     this->nb =  NetizenBroker::getInstance();
     this->jb = JottingBroker::getInstance();
+    this->cb =CommentBroker::getInstance();
     this->mb = MaterialBroker::getInstance();
 
 //    Init();
@@ -45,17 +48,15 @@ void JottingSocialControl::login(int id)
     m_netizen->setInterests(nb->findInterests(m_netizen->getID()));
     m_netizen->get_Interests_ID_Info();
 
-
-
 }
 
 void JottingSocialControl::pushJottings()
 {
     //Concurrent operation
     //A: Find Jottings published by netizen's interests and push them
-    m_netizen->pushInterestsJotting(nb,jb,mb);
+    qDebug()<<"\n....随机推送笔记....";
+//    m_jottings.append(m_netizen->pushInterestsJotting(jb));
 
-    qDebug()<<"....随机推送笔记....";
     qDebug()<<" ";
     //B:Find the Jottings published in the system and push them randomly
     m_jottings=jb->findSomeJottings();
@@ -63,6 +64,34 @@ void JottingSocialControl::pushJottings()
     for(auto jotting: m_jottings){
         jotting->getJotDig(nb,mb,jb);
     }
+
+}
+
+void JottingSocialControl::checkOneJot(int index)
+{
+    qDebug()<<"\n....选择某个笔记详细查看：....";
+    m_scanJotting=findJot(index);
+    m_scanJotting->getTheJotDetail(nb,cb);
+}
+
+Jotting *JottingSocialControl::findJot(int index)
+{
+    return m_jottings[index];
+}
+
+void JottingSocialControl::commentTheJot(QString content)
+{
+    Comment* comment=new Comment(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"),content,m_netizen,m_scanJotting);
+    //Concurrent operation
+
+    //A:cb->addNewComment(Comment* comment)
+
+    //B:
+    m_netizen->addPostedCom(nb,comment);
+
+    //C:
+    m_scanJotting->addNewComment(jb,comment);
+
 
 }
 

@@ -31,10 +31,10 @@ int JottingBroker::findJotPublisher(int jotting_id) const
 QVector<Jotting *> JottingBroker::findSomeJottings()
 {
    QVector<Jotting*> jts;
-   srand((unsigned)time(NULL));
-   for(int i=0;i<5;i++){
-       int r=rand()%16+1;
-       jts.push_back(findJottingById(r));
+//   srand((unsigned)time(NULL));
+   for(int i=1;i<=8;i++){
+//       int r=rand()%9+1;
+       jts.push_back(findJottingById(i));
    }
    return jts;
 

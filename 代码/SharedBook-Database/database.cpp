@@ -94,12 +94,28 @@ QHash<QString, QString> DataBase::findMaterialById(int id)
     return dbValues;
 }
 
+QHash<QString, QString> DataBase::findCommentById(int id)
+{
+    QHash<QString,QString> dbValues;
+    QString id_S=QString::number(id);
+    query->exec("select * from Comment where C_id="+id_S);
+    while(query->next()){
+        dbValues.insert("id",query->value(0).toString());
+        dbValues.insert("jottingId",query->value(1).toString());
+        dbValues.insert("netizenId",query->value(2).toString());
+        dbValues.insert("content",query->value(3).toString());
+        dbValues.insert("time",query->value(4).toString());
+        dbValues.insert("likeCount",query->value(5).toString());
+    }
+    return dbValues;
+}
+
 QVector<QHash<QString, QString>> DataBase::findNetizenJots(int n_id)
 {
     QVector<QHash<QString, QString>> values;
     QHash<QString,QString> dbValues;
     QString id_S=QString::number(n_id);
-    query->exec("select * from Jotting where J_netizenId="+id_S);
+    query->exec("select * from Jotting where N_id="+id_S);
     while(query->next()){
         dbValues.insert("id",query->value(0).toString());
         dbValues.insert("text",query->value(1).toString());
@@ -117,12 +133,35 @@ QVector<QString> DataBase::findRelationById(QString type, int n_id)
     QVector<QString> values;
     QString id_S=QString::number(n_id);
     if(type=="interested"){
-        query->exec("select R_netizenId from Relation where R_fansId="+id_S);
+        query->exec("select N_id from Relation where N_Fan_id="+id_S);
     }else{
-        query->exec("select R_fansId from Relation where R_netizenId="+id_S);
+        query->exec("select N_Fan_id from Relation where N_id="+id_S);
     }
     while(query->next()){
         values.append(query->value(0).toString());
+    }
+    return values;
+}
+
+QVector<QHash<QString, QString> > DataBase::findCommentByJot_NetizenId(QString type, int id)
+{
+    QVector<QHash<QString, QString>> values;
+    QHash<QString,QString> dbValues;
+    QString id_S=QString::number(id);
+    if(type=="jotting"){
+        query->exec("select * from Comment where J_id="+id_S);
+    }else{
+        query->exec("select * from Comment where N_id="+id_S);
+    }
+    while(query->next()){
+        dbValues.insert("id",query->value(0).toString());
+        dbValues.insert("jottingId",query->value(1).toString());
+        dbValues.insert("netizenId",query->value(2).toString());
+        dbValues.insert("content",query->value(3).toString());
+        dbValues.insert("time",query->value(4).toString());
+        dbValues.insert("likeCount",query->value(5).toString());
+        values.append(dbValues);
+        dbValues.clear();
     }
     return values;
 }
@@ -132,56 +171,55 @@ void DataBase::initDataBase()
 //        query->exec("drop table Netizen");
 //        query->exec("drop table Jotting");
 //        query->exec("drop table Material");
+//        query->exec("drop table Relation");
+//        query->exec("drop table Comment");
 
     query->exec("create table Netizen(N_id integer not null primary key AUTOINCREMENT,N_name varchar(50),N_avater varchar(50),N_signal varchar(2000))");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('张三','头像1','床前明月光')");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('李四','头像2','疑是地上霜')");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('王五','头像3','举头望明月')");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('赵六','头像4','低头思故乡')");
-    query->exec("insert into Netizen (N_name,N_avater,N_signal) values('周一','头像5','鹅鹅鹅，曲项向天歌')");
 
-    query->exec("create table Jotting(J_id integer not null primary key AUTOINCREMENT,J_text varchar(10000),J_date varchar(100) not null,J_netizenId integer not null,J_materialId integer not null)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('假若决绝离开你','2021-09-08',1,1)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('花瓣展开三乐意地','2021-09-09',1,2)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('我已经渐渐习惯了这里','2021-09-10',1,3)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('不相信过去回不去','2021-09-11',1,4)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('想再去寻昨日回来','2021-09-12',2,5)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('剩下的却只有期待','2021-09-13',2,6)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('只留下遍地的花叶残败','2021-09-14',2,7)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('拾不起才突然发觉不甘心','2021-09-15',3,8)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('可否把走过的路在退回走一遍','2021-09-16',3,9)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('至少让这杯咖啡风味稍微变甜','2021-09-17',4,10)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('记得这种苦涩感你好像不太喜欢','2021-09-18',4,11)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('这样能否留点好感','2021-09-19',4,12)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('重新把熄灭成灰的篝火再点燃','2021-09-20',4,12)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('看一遍烟花绽放时会何其绚烂','2021-09-21',4,13)");
-    query->exec("insert into Jotting (J_text,J_date,J_netizenId,J_materialId) values('散的怎么去点燃绚烂过后会变淡','2021-09-22',5,13)");
+    query->exec("create table Jotting(J_id integer not null primary key AUTOINCREMENT,J_text varchar(10000),J_date varchar(100) not null,N_id integer not null,M_Id integer not null)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('假若决绝离开你','2021-09-08',1,1)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('花瓣展开三乐意地','2021-09-09',1,2)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('我已经渐渐习惯了这里','2021-09-10',1,3)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('不相信过去回不去','2021-09-11',2,4)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('想再去寻昨日回来','2021-09-12',2,5)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('剩下的却只有期待','2021-09-13',3,6)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('只留下遍地的花叶残败','2021-09-14',3,7)");
+    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('拾不起才突然发觉不甘心','2021-09-15',4,8)");
 
-    query->exec("create table Material(M_id integer not null primary key AUTOINCREMENT,M_pictures varchar(50))");
-    query->exec("insert into Material (M_pictures) values('pictures1')");
-    query->exec("insert into Material (M_pictures) values('pictures2')");
-    query->exec("insert into Material (M_pictures) values('pictures3')");
-    query->exec("insert into Material (M_pictures) values('pictures4')");
-    query->exec("insert into Material (M_pictures) values('pictures5')");
-    query->exec("insert into Material (M_pictures) values('pictures6')");
-    query->exec("insert into Material (M_pictures) values('pictures7')");
-    query->exec("insert into Material (M_pictures) values('pictures8')");
-    query->exec("insert into Material (M_pictures) values('pictures9')");
-    query->exec("insert into Material (M_pictures) values('pictures10')");
-    query->exec("insert into Material (M_pictures) values('pictures11')");
-    query->exec("insert into Material (M_pictures) values('pictures12')");
-    query->exec("insert into Material (M_pictures) values('pictures13')");
-    query->exec("insert into Material (M_pictures) values('pictures14')");
-    query->exec("insert into Material (M_pictures) values('pictures15')");
 
-//    query->exec("create table Relation(R_netizenId integer not null,R_fansId integer)");
-//    query->exec("insert into Relation values(1,2)");
-//    query->exec("insert into Relation values(1,3)");
-//    query->exec("insert into Relation values(2,3)");
-//    query->exec("insert into Relation values(2,5)");
-//    query->exec("insert into Relation values(3,4)");
-//    query->exec("insert into Relation values(3,2)");
-//    query->exec("insert into Relation values(4,5)");
+    query->exec("create table Material(M_id integer not null primary key AUTOINCREMENT ,M_content varchar(50))");
+    query->exec("insert into Material (M_content) values('图片1,图片2,音频1')");
+    query->exec("insert into Material (M_content) values('图片3,图片4,图片5')");
+    query->exec("insert into Material (M_content) values('图片5,图片6,图片7,图片8,图片9')");
+    query->exec("insert into Material (M_content) values('图片10,音频2')");
+    query->exec("insert into Material (M_content) values('视频1')");
+    query->exec("insert into Material (M_content) values('视频2')");
+    query->exec("insert into Material (M_content) values('图片3,图片12,图片13')");
+    query->exec("insert into Material (M_content) values('图片2，音频3')");
+
+    query->exec("create table Relation(N_id integer not null,N_Fan_id integer)");
+    query->exec("insert into Relation values(1,2)");
+    query->exec("insert into Relation values(1,3)");
+    query->exec("insert into Relation values(2,3)");
+    query->exec("insert into Relation values(2,4)");
+    query->exec("insert into Relation values(3,4)");
+    query->exec("insert into Relation values(4,1)");
+
+    query->exec("create table Comment(C_id integer not null primary key AUTOINCREMENT,J_id integer not null,N_id integer not null,C_content varchar(5000) not null,C_time varchar(50) not null,C_likeCount  int)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(1,1,'不错哟','2022-02-08',5)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(1,2,'非常棒，已安利！！！','2022-02-09',6)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(2,3,'绝绝子','2022-02-10',4)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(2,4,'棒棒哒','2022-02-11',5)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(3,2,'好听！','2022-02-12',2)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(4,3,'没有之前的好听！','2022-02-13',3)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(5,1,'什么时候有下一个？','2022-02-14',12)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(6,4,'加油呀','2022-02-15',5)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(7,2,'赞赞赞','2022-02-16',3)");
+    query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(8,3,'牛牛牛!','2022-02-17',6)");
 
 //    query->exec("pragma foreign_keys = on");
 }

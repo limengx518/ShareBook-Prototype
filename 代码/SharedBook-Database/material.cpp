@@ -2,17 +2,22 @@
 #include "jotting.h"
 #include <iostream>
 
-Material::Material(int id,QString pictures)
+Material::Material(int id,QString materials)
 {
-    this->m_materialid = id;
-    this->m_pictures = pictures;
+    this->m_materialId = id;
+    this->m_materials = materials;
+}
+
+void Material::getMaterialDetail()
+{
+    qDebug()<<"所有素材信息："<<m_materials;
 }
 
 void Material::getMaterialDig()
 {
-//    for(auto & pic:this->m_pictures)
+//    for(auto & pic:this->m_materials)
 //         qDebug()<<pic<<"  ";
-    qDebug()<<m_pictures;
+    qDebug()<<"素材信息："<<m_materials;
 }
 
 void Material::setJotting(Jotting *jot)
@@ -22,5 +27,5 @@ void Material::setJotting(Jotting *jot)
 
 int Material::getMaterialId()
 {
-    return this->m_materialid;
+    return this->m_materialId;
 }

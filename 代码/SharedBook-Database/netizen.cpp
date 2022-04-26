@@ -1,6 +1,7 @@
 #include "netizen.h"
 #include "materialbroker.h"
 #include "jottingbroker.h"
+#include "comment.h"
 #include <iostream>
 
 Netizen::Netizen()
@@ -31,7 +32,7 @@ void Netizen::get_Netizen_ID_Info()
 
 void Netizen::get_Fans_ID_Info()
 {
-     qDebug()<<"\n....得到该网民的粉丝所有ID信息....";
+     qDebug()<<"\n....得到该网民的粉丝所有ID信息....\n";
     for(auto & fan:this->m_fans){
         fan->get_Netizen_ID_Info();
     }
@@ -50,10 +51,16 @@ QVector<Netizen*> Netizen::getInterests()
 
 void Netizen::get_Interests_ID_Info()
 {
-     qDebug()<<"\n....得到该网民关注的人的所有ID信息....";
+     qDebug()<<"\n....得到该网民关注的人的所有ID信息....\n";
     for(auto & interest:this->m_interests){
         interest->get_Netizen_ID_Info();
     }
+}
+
+void Netizen::addPostedCom(NetizenBroker* nb,Comment *comment)
+{
+    m_postedComment.append(comment);
+    //nb->update(comment);
 }
 
 QString Netizen::getNickname()
@@ -61,16 +68,18 @@ QString Netizen::getNickname()
     return this->m_nickname;
 }
 
-void Netizen::pushInterestsJotting(NetizenBroker *nb,JottingBroker *jb,MaterialBroker *mb)
+QVector<Jotting*> Netizen::pushInterestsJotting(JottingBroker* jb)
 {
     //According to the ID of the person interested in netizens,
     //find all Jottings published by the person interested in through JottingBroker
     //get the digest of the Jottings.
+    QVector<Jotting* > jts;
     for(auto & interest: this->m_interests){
         QVector<Jotting*> tempJottings=jb->findNetizenJotById(interest->getID());
         interest->setJottings(tempJottings);
-        interest->getAllJotDig(nb,mb,jb);
+        jts.append(tempJottings);
     }
+    return jts;
 }
 
 //

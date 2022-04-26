@@ -1,4 +1,5 @@
 #include "jotting.h"
+#include "commentbroker.h"
 #include "netizen.h"
 #include "materialbroker.h"
 #include <iostream>
@@ -43,10 +44,35 @@ void Jotting::setId(int id)
     this->m_id = id;
 }
 
+void Jotting::addNewComment(JottingBroker* jb,Comment *comment)
+{
+    m_comments.append(comment);
+    //jb->update(this)
+}
+
 void Jotting::setMaterial(Material *material)
 {
     this->m_material = material;
-//    m_material->setJotting(this);
+    //    m_material->setJotting(this);
+}
+
+void Jotting::getTheJotDetail(NetizenBroker* nb,CommentBroker* cb)
+{
+    qDebug()<<"发布时间："<<this->m_time<<"   "<<" 文本内容："<<this->m_text<<"   ";
+
+    //Concurrent operation
+    //A:
+    m_material->getMaterialDetail();
+
+
+    if(m_comments.size()==0){
+        setComment(cb->findJotComment(m_id));
+    }
+
+    //B:
+    qDebug()<<"所有评论信息：";
+    for(auto &comment:m_comments)
+        comment->getCommentDetail(nb,cb);
 }
 
 Netizen Jotting::getPublisher()
@@ -57,4 +83,9 @@ Netizen Jotting::getPublisher()
 void Jotting::setPublisher(Netizen *publisher)
 {
     this->m_publisher = publisher;
+}
+
+void Jotting::setComment(QVector<Comment *> comments)
+{
+    m_comments=comments;
 }
