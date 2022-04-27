@@ -25,7 +25,9 @@ public:
     QVector<Netizen*> findInterests(int netizen_id)const;
     QVector<Netizen*> findFans(int netizen_id)const;
 
-    void add(Netizen netizen)const;
+    void addNewNetizen(Netizen *netizen)const;    //修改
+    void addFan(int id,int fan_id)const;
+    void addInterst(int id,int interst_id)const;
 
 private:
     NetizenBroker(){};

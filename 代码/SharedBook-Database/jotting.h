@@ -19,6 +19,7 @@ class Jotting
 public:
     Jotting();
     Jotting(int id,QString time,QString text,Netizen *publisher=nullptr,Material *material=nullptr);
+    Jotting(QString time,QString text,Netizen *publisher=nullptr,Material *material=nullptr);
 
     void getJotDig(NetizenBroker *nb,MaterialBroker *mb,JottingBroker * jb);
     void setMaterial(Material *material);
@@ -31,10 +32,14 @@ public:
 
     int getID();
     void setId(int id);
+    QString getText();
+    QString getTime();
 
-    void addNewComment(JottingBroker* jb,Comment* comment);
+
+    void changeMaterial();
+    void addNewComment(Comment* comment);
 private:
-    int m_id;
+    int m_id=0;
     QString m_time;
     QString m_text;
 

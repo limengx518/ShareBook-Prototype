@@ -48,3 +48,10 @@ int CommentBroker::findCommentNetizenById(int comment_id)
     return map.value("netizenId").toInt();
 
 }
+
+void CommentBroker::addNewComment(Comment *comment, int j_id, int n_id) const
+{
+    QString inserCommend=QString("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(%1,%2,'%3','%4',%5)").arg(j_id).arg(n_id).arg(comment->getContent()).arg(comment->getDate()).arg(comment->getLikeCounter());
+    db->insertData(inserCommend);
+
+}

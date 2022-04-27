@@ -45,3 +45,22 @@ QVector<Netizen *> NetizenBroker::findFans(int netizen_id) const
     return nts;
 }
 
+void NetizenBroker::addNewNetizen(Netizen *netizen) const
+{
+    QString inserCommend=QString("insert into Netizen (N_name,N_avater,N_signal) values('%1','%2','%3')").arg(netizen->getNickname()).arg(netizen->getAvatar()).arg(netizen->getSignal());
+    db->insertData(inserCommend);
+}
+
+void NetizenBroker::addFan(int id, int fan_id) const
+{
+    QString inserCommend=QString("insert into Relation values(%1,%2)").arg(id).arg(fan_id);
+    db->insertData(inserCommend);
+}
+
+void NetizenBroker::addInterst(int id, int interst_id) const
+{
+    QString inserCommend=QString("insert into Relation values(%1,%2)").arg(interst_id).arg(id);
+    db->insertData(inserCommend);
+}
+
+

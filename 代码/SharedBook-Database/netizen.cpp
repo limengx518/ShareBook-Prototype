@@ -57,15 +57,24 @@ void Netizen::get_Interests_ID_Info()
     }
 }
 
-void Netizen::addPostedCom(NetizenBroker* nb,Comment *comment)
+void Netizen::addPostedCom(Comment *comment)
 {
     m_postedComment.append(comment);
-    //nb->update(comment);
 }
 
 QString Netizen::getNickname()
 {
     return this->m_nickname;
+}
+
+QString Netizen::getAvatar()
+{
+    return this->m_avatar;
+}
+
+QString Netizen::getSignal()
+{
+    return this->m_signal;
 }
 
 QVector<Jotting*> Netizen::pushInterestsJotting(JottingBroker* jb)
@@ -80,6 +89,11 @@ QVector<Jotting*> Netizen::pushInterestsJotting(JottingBroker* jb)
         jts.append(tempJottings);
     }
     return jts;
+}
+
+void Netizen::addNewJotting(Jotting *jotting)
+{
+    m_jottings.append(jotting);
 }
 
 //

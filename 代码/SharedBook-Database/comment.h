@@ -19,6 +19,8 @@ public:
     void setNetizen(Netizen* netizen);
     QString getContent();
     int getId();
+    int getLikeCounter();
+    QString getDate();
 
 private:
     int m_id;

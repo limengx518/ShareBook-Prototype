@@ -31,6 +31,7 @@ public:
 
     //找netizen的jottings
     QVector<Jotting*> findNetizenJotById(int n_id)const;
+    int addNewJotting(Jotting *jotting,int N_id)const;    //修改
 
 private:
     JottingBroker(){};

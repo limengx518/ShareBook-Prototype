@@ -50,3 +50,10 @@ QVector<Jotting*> JottingBroker::findNetizenJotById(int n_id) const
     }
     return jts;
 }
+
+int JottingBroker::addNewJotting(Jotting *jotting, int N_id) const
+{
+    QString insertCommend=QString("insert into Jotting (J_text,J_date,N_id) values('%1','%2',%3)").arg(jotting->getText()).arg(jotting->getTime()).arg(N_id);
+    db->insertData(insertCommend);
+    return db->findInsertData("J_id","Jotting");
+}

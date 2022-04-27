@@ -23,19 +23,27 @@ int main(int argc, char *argv[])
     int account = 3;
 
     jsc->login(account);
-    jsc->pushJottings();
-    jsc->checkOneJot(2);
 
-//    DataBase *db=DataBase::getInstance();
+    jsc->pushJottings();
+
+    jsc->checkOneJot(2);
+//    jsc->commentTheJot("呵呵呵");
+
+//    jsc->sendChooseMaterialReq();
+//    jsc->sendNewJottingContents("我与乘风归去，又恐琼楼玉宇");
+//    jsc->sendPreviewRequest();
+//    jsc->sendAdaptMaterialReq();
+//    jsc->sendPublishRequest();
+
+
+    DataBase *db=DataBase::getInstance();
 //    db->connectDataBase("Netizen");
 //    db->connectDataBase("Comment");
-//    db->connectDataBase("Material");
-//    db->connectDataBase("Relation");
+    db->connectDataBase("Relation");
 //    db->connectDataBase("Jotting");
 //    db->showDataBase("Netizen");
 //    db->showDataBase("Comment");
-//    db->showDataBase("Material");
-//    db->showDataBase("Relation");
+    db->showDataBase("Relation");
 //    db->showDataBase("Jotting");
     return a.exec();
 }

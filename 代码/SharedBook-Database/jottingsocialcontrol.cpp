@@ -3,8 +3,14 @@
 #include "netizenbroker.h"
 #include "commentbroker.h"
 #include "netizen.h"
+#include "material.h"
+#include "picture.h"
+#include "video.h"
+#include "audio.h"
+
 
 #include "jottingsocialcontrol.h"
+
 
 #include <iostream>
 #include <fstream>
@@ -84,15 +90,78 @@ void JottingSocialControl::commentTheJot(QString content)
     Comment* comment=new Comment(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"),content,m_netizen,m_scanJotting);
     //Concurrent operation
 
-    //A:cb->addNewComment(Comment* comment)
+    //A:
+    cb->addNewComment(comment,m_scanJotting->getID(),m_netizen->getID());
 
     //B:
-    m_netizen->addPostedCom(nb,comment);
+    m_netizen->addPostedCom(comment);
 
     //C:
-    m_scanJotting->addNewComment(jb,comment);
+    m_scanJotting->addNewComment(comment);
 
 
+    sendFollowRequest();
+}
+
+void JottingSocialControl::sendFollowRequest()
+{
+    nb->addInterst(m_netizen->getID(),m_scanJotting->getPublisher().getID());
+}
+
+void JottingSocialControl::sendChooseMaterialReq()
+{
+    chooseMaterialInterface();
+}
+
+void JottingSocialControl::chooseMaterialInterface()
+{
+    QVector<Picture *> temp_pictures = {new Picture("图片21"),new Picture("图片22")};
+    Video *temp_video=nullptr;
+    Audio *temp_audio = new Audio("听妈妈的话");
+//    QString path;
+    qDebug()<<" 提供选择素材的接口";
+//    while(true){
+//         path=chooseMaterial();
+//        if(path=="") break;
+//        if(/*路径后缀 */){
+//            Picture *temp_pic = new Picture(path);
+//            temp_pictures.push_back(temp_pic);
+//            if(temp_pictures.size()>9){
+
+//            }
+//        }else if(){
+//            Video *video = new Video(path);
+//        }else if(){
+//            Audio * audio = new Audio(path);
+//        }
+//    }
+
+    m_previewMaterial = new Material(temp_pictures,temp_audio,temp_video);
 }
 
 
+void JottingSocialControl::sendNewJottingContents(QString content)
+{
+    m_previewJotting = new Jotting(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"),content,m_netizen,m_previewMaterial);
+}
+
+void JottingSocialControl::sendPreviewRequest()
+{
+    m_previewJotting->getTheJotDetail(nb,cb);
+}
+
+void JottingSocialControl::sendAdaptMaterialReq()
+{
+    m_previewJotting->changeMaterial();
+}
+
+void JottingSocialControl::sendPublishRequest()
+{
+    //并发
+    //A
+    m_previewJotting->setId(jb->addNewJotting(m_previewJotting,m_netizen->getID()));
+    //B
+    mb->addNewJotMaterial(m_previewMaterial,m_previewJotting->getID());
+    //C
+    m_netizen->addNewJotting(m_previewJotting);
+}

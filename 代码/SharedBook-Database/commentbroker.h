@@ -22,6 +22,7 @@ public:
     QVector<Comment*> findNetizenComment(int netizen_id);
     int findCommentJotById(int comment_id);
     int findCommentNetizenById(int comment_id);
+    void addNewComment(Comment *comment, int j_id, int n_id) const;
 private:
     CommentBroker(){};
     static CommentBroker *commentBroker;

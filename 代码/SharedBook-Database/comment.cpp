@@ -44,3 +44,13 @@ int Comment::getId()
 {
     return this->m_id;
 }
+
+int Comment::getLikeCounter()
+{
+    return this->m_likeCounter;
+}
+
+QString Comment::getDate()
+{
+    return this->m_date;
+}

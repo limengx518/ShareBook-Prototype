@@ -30,10 +30,14 @@ public:
     QVector<Netizen*> getInterests();
     void get_Interests_ID_Info();
 
-    void addPostedCom(NetizenBroker* nb,Comment* comment);
+    void addPostedCom(Comment* comment);
     QString getNickname();
+    QString getAvatar();
+    QString getSignal();
 
     QVector<Jotting*> pushInterestsJotting(JottingBroker* jb);
+
+    void addNewJotting(Jotting *jotting);
 
 private:
     int m_id;

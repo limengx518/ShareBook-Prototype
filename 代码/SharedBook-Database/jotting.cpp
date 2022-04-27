@@ -14,6 +14,14 @@ Jotting::Jotting(int id,QString time,QString text,Netizen *publisher,Material *m
     this->m_text = text;
 }
 
+Jotting::Jotting(QString time, QString text, Netizen *publisher, Material *material)
+{
+    this->m_time = time;
+    this->m_material = material;
+    this->m_publisher = publisher;
+    this->m_text = text;
+}
+
 //
 void Jotting::getJotDig(NetizenBroker *nb,MaterialBroker *mb,JottingBroker * jb)
 {
@@ -24,7 +32,7 @@ void Jotting::getJotDig(NetizenBroker *nb,MaterialBroker *mb,JottingBroker * jb)
         setPublisher(nb->findNetizenById(jb->findJotPublisher(this->m_id)));
     }
     if(this->m_material==nullptr){
-        setMaterial(mb->findMaterialById(jb->findMatrialByID(this->m_id)));
+        setMaterial(mb->findJotMaterial(m_id));
     }
 
      m_material->getMaterialDig();
@@ -44,10 +52,24 @@ void Jotting::setId(int id)
     this->m_id = id;
 }
 
-void Jotting::addNewComment(JottingBroker* jb,Comment *comment)
+QString Jotting::getText()
+{
+    return m_text;
+}
+
+QString Jotting::getTime()
+{
+    return m_time;
+}
+
+void Jotting::changeMaterial()
+{
+    this->m_material->adapt();
+}
+
+void Jotting::addNewComment(Comment *comment)
 {
     m_comments.append(comment);
-    //jb->update(this)
 }
 
 void Jotting::setMaterial(Material *material)
@@ -64,15 +86,17 @@ void Jotting::getTheJotDetail(NetizenBroker* nb,CommentBroker* cb)
     //A:
     m_material->getMaterialDetail();
 
-
-    if(m_comments.size()==0){
+    //B:
+    if(m_comments.size()==0 && m_id!=0){
         setComment(cb->findJotComment(m_id));
     }
 
-    //B:
+
     qDebug()<<"所有评论信息：";
-    for(auto &comment:m_comments)
-        comment->getCommentDetail(nb,cb);
+    if(m_comments.size()!=0){
+        for(auto &comment:m_comments)
+            comment->getCommentDetail(nb,cb);
+    }
 }
 
 Netizen Jotting::getPublisher()

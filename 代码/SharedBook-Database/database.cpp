@@ -82,16 +82,15 @@ QHash<QString,QString> DataBase::findJottingById(int id)
     return dbValues;
 }
 
-QHash<QString, QString> DataBase::findMaterialById(int id)
+QHash<QString, QString> DataBase::findMaterialById(QString commend)
 {
-    QHash<QString,QString> dbValues;
-    QString id_S=QString::number(id);
-    query->exec("select * from Material where M_id="+id_S);
-    while(query->next()){
-        dbValues.insert("id",query->value(0).toString());
-        dbValues.insert("pictures",query->value(1).toString());
-    }
-    return dbValues;
+   QHash<QString,QString> dbValues;
+   query->exec(commend);
+   while(query->next()){
+       dbValues.insert("id",query->value(0).toString());
+       dbValues.insert("content",query->value(1).toString());
+   }
+   return dbValues;
 }
 
 QHash<QString, QString> DataBase::findCommentById(int id)
@@ -166,13 +165,54 @@ QVector<QHash<QString, QString> > DataBase::findCommentByJot_NetizenId(QString t
     return values;
 }
 
+QHash<QString, QVector<QString> > DataBase::findJotMaterial(int j_id)
+{
+    QHash<QString,QVector<QString>> dbValues;
+    QVector<QString> ids;
+    QHash<QString,QString> types;
+    types.insert("Picture","P_id");
+    types.insert("Audio","A_id");
+    types.insert("Video","V_id");
+    QHash<QString, QString>::iterator i;
+    for(i=types.begin(); i!=types.end(); ++i){
+        QString commend="select "+i.value()+" from "+i.key()+" where J_id="+QString::number(j_id);
+        query->exec(commend);
+        while(query->next()){
+            ids.append(query->value(0).toString());
+        }
+        dbValues.insert(i.key(),ids);
+        ids.clear();
+    }
+
+    return dbValues;
+}
+
+void DataBase::insertData(QString commend) const
+{
+    query->exec(commend);
+}
+
+int DataBase::findInsertData(QString table_id,QString table) const
+{
+    QString commend="select count(*) from "+table;
+    query->exec(commend);
+    QString id;
+    if(query->next()){
+        id=query->value(0).toString();
+    }
+    return id.toInt();
+}
+
+
 void DataBase::initDataBase()
 {
-//        query->exec("drop table Netizen");
-//        query->exec("drop table Jotting");
-//        query->exec("drop table Material");
-//        query->exec("drop table Relation");
-//        query->exec("drop table Comment");
+        query->exec("drop table Netizen");
+        query->exec("drop table Jotting");
+        query->exec("drop table Picture");
+        query->exec("drop table Relation");
+        query->exec("drop table Audio");
+        query->exec("drop table Video");
+        query->exec("drop table Comment");
 
     query->exec("create table Netizen(N_id integer not null primary key AUTOINCREMENT,N_name varchar(50),N_avater varchar(50),N_signal varchar(2000))");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('张三','头像1','床前明月光')");
@@ -180,15 +220,15 @@ void DataBase::initDataBase()
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('王五','头像3','举头望明月')");
     query->exec("insert into Netizen (N_name,N_avater,N_signal) values('赵六','头像4','低头思故乡')");
 
-    query->exec("create table Jotting(J_id integer not null primary key AUTOINCREMENT,J_text varchar(10000),J_date varchar(100) not null,N_id integer not null,M_Id integer not null)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('假若决绝离开你','2021-09-08',1,1)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('花瓣展开三乐意地','2021-09-09',1,2)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('我已经渐渐习惯了这里','2021-09-10',1,3)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('不相信过去回不去','2021-09-11',2,4)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('想再去寻昨日回来','2021-09-12',2,5)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('剩下的却只有期待','2021-09-13',3,6)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('只留下遍地的花叶残败','2021-09-14',3,7)");
-    query->exec("insert into Jotting (J_text,J_date,N_id,M_Id) values('拾不起才突然发觉不甘心','2021-09-15',4,8)");
+    query->exec("create table Jotting(J_id integer not null primary key AUTOINCREMENT,J_text varchar(10000),J_date varchar(100) not null,N_id integer not null)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('假若决绝离开你','2021-09-08',1)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('花瓣展开三乐意地','2021-09-09',1)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('我已经渐渐习惯了这里','2021-09-10',1)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('不相信过去回不去','2021-09-11',2)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('想再去寻昨日回来','2021-09-12',2)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('剩下的却只有期待','2021-09-13',3)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('只留下遍地的花叶残败','2021-09-14',3)");
+    query->exec("insert into Jotting (J_text,J_date,N_id) values('拾不起才突然发觉不甘心','2021-09-15',4)");
 
 
     query->exec("create table Material(M_id integer not null primary key AUTOINCREMENT ,M_content varchar(50))");
@@ -221,5 +261,32 @@ void DataBase::initDataBase()
     query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(7,2,'赞赞赞','2022-02-16',3)");
     query->exec("insert into Comment (J_id,N_id,C_content,C_time,C_likeCount) values(8,3,'牛牛牛!','2022-02-17',6)");
 
-//    query->exec("pragma foreign_keys = on");
+
+    query->exec("create table Audio(A_id integer not null primary key AUTOINCREMENT ,A_content varchar(50),J_id integer not null)");
+    query->exec("insert into Audio (A_content,J_id) values('音频1',1)");
+    query->exec("insert into Audio (A_content,J_id) values('音频2',4)");
+    query->exec("insert into Audio (A_content,J_id) values('音频3',8)");
+
+    query->exec("create table Video(V_id integer not null primary key AUTOINCREMENT ,V_content varchar(50),J_id integer not null)");
+    query->exec("insert into Video (V_content,J_id) values('视频1',5)");
+    query->exec("insert into Video (V_content,J_id) values('视频2',6)");
+
+    query->exec("create table Picture(P_id integer not null primary key AUTOINCREMENT ,P_content varchar(50),J_id integer not null)");
+    query->exec("insert into Picture (P_content,J_id) values('图片1',1)");
+    query->exec("insert into Picture (P_content,J_id) values('图片2',1)");
+    query->exec("insert into Picture (P_content,J_id) values('图片3',2)");
+    query->exec("insert into Picture (P_content,J_id) values('图片4',2)");
+    query->exec("insert into Picture (P_content,J_id) values('图片5',2)");
+    query->exec("insert into Picture (P_content,J_id) values('图片5',3)");
+    query->exec("insert into Picture (P_content,J_id) values('图片6',3)");
+    query->exec("insert into Picture (P_content,J_id) values('图片7',3)");
+    query->exec("insert into Picture (P_content,J_id) values('图片8',3)");
+    query->exec("insert into Picture (P_content,J_id) values('图片9',4)");
+    query->exec("insert into Picture (P_content,J_id) values('图片10',4)");
+    query->exec("insert into Picture (P_content,J_id) values('图片12',7)");
+    query->exec("insert into Picture (P_content,J_id) values('图片13',7)");
+    query->exec("insert into Picture (P_content,J_id) values('图片2',8)");
+
+
+    //    query->exec("pragma foreign_keys = on");
 }
