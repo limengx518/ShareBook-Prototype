@@ -22,6 +22,11 @@ Material &MaterialBroker::findMaterialById(std::string id)
 
 }
 
+void MaterialBroker::addNewMaterial(Material *material)
+{
+    _materialsCache.insert(std::pair<std::string,Material>(material->id(),*material));
+}
+
 MaterialBroker::MaterialBroker()
 {
 

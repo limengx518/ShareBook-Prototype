@@ -18,7 +18,22 @@ Jotting &JottingBroker::findJottingById(std::string id)
         Jotting jotting=*(RelationalBroker::findJottingById(id));
         _jottingsCache.insert(std::pair<std::string,Jotting>(id,jotting));
     }
-     return _jottingsCache.at(id);
+    return _jottingsCache.at(id);
+}
+
+std::vector<std::string> JottingBroker::getSomeJottingsId(std::string lastTime, std::string thisTime)
+{
+    std::vector<std::string>idVector;
+    for(auto &jotting:RelationalBroker::findSomeJottings(lastTime,thisTime)){
+        _jottingsCache.insert(std::pair<std::string,Jotting>(jotting->id(),*jotting));
+        idVector.push_back(jotting->id());
+    }
+    return idVector;
+}
+
+void JottingBroker::addNewJotting(Jotting *jotting)
+{
+    _jottingsCache.insert(std::pair<std::string,Jotting>(jotting->id(),*jotting));
 }
 
 JottingBroker::JottingBroker()

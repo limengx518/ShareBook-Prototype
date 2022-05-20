@@ -7,7 +7,7 @@ class MaterialInterface
 {
 public:
     explicit MaterialInterface(const std::string &tid);
-    virtual ~MaterialInterface(){}
+    virtual  ~MaterialInterface(){}
 
     virtual std::string getMaterialAbstract()  = 0;
     std::string id() const;

@@ -12,6 +12,11 @@ Material::Material(const std::string id, std::string path):
 
 }
 
+std::string Material::path()
+{
+    return m_path;
+}
+
 std::string Material::getMaterialAbstract()
 {
     return m_path;

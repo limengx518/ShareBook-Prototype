@@ -14,7 +14,7 @@ public:
     virtual std::string getMaterialAbstract() override;
 
 private:
-    Material *_material=nullptr;
+    Material *_material;
 };
 
 #endif // MATERIALPROXY_H

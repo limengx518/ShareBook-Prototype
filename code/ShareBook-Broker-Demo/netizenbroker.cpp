@@ -23,6 +23,8 @@ Netizen &NetizenBroker::findNetizenById(std::string id)
 
 NetizenBroker::~NetizenBroker()
 {
+    if(m_netizenBroker!=nullptr)
+        delete m_netizenBroker;
 }
 
 NetizenBroker::NetizenBroker()

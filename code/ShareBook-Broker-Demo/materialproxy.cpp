@@ -17,7 +17,7 @@ MaterialProxy::~MaterialProxy()
 std::string MaterialProxy::getMaterialAbstract()
 {
     if(_material==nullptr){
-        _material=new Material((MaterialBroker::getInstance())->findMaterialById(id()));
+        _material=&(MaterialBroker::getInstance())->findMaterialById(id());
     }
      return _material->getMaterialAbstract();
 }

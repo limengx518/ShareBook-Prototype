@@ -191,3 +191,27 @@ std::vector<std::string> RelationalBroker::findNetizenConcereds(std::string neti
     }
     return conceredIds;
 }
+
+std::vector<Jotting *> RelationalBroker::findSomeJottings(std::string lastTime, std::string thisTime)
+{
+    Jotting *jotting=nullptr;
+    std::string com="select * from Jotting where J_id between "+ lastTime +" and "+thisTime; //一定时间段的笔记
+    std::vector<Jotting *> jottings;
+    std::string id,content;
+    try {
+            // Create a new Statement
+        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
+            // Execute query
+        sql::ResultSet *res = stmnt->executeQuery(com);
+            // Loop through and print results
+        while (res->next()) {
+            id=std::to_string(res->getInt(1));
+            content=res->getString(2);
+            jotting=new Jotting(id,content,findJottingMaterial(id));
+            jottings.push_back(jotting);
+        }
+    }catch(sql::SQLException& e){
+        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
+    }
+    return jottings;
+}

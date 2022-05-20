@@ -45,6 +45,11 @@ void Netizen::getInfo()
     std::cout<<netizenInfo.dump(4)<<std::endl;
 }
 
+std::string Netizen::nickName()
+{
+    return m_nickName;
+}
+
 nlohmann::json Netizen::getNetizenAbstract()
 {
     json j;

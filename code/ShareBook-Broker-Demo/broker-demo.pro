@@ -7,6 +7,9 @@ LIBS+=-lmariadbcpp
 
 
 SOURCES += \
+        comment.cpp \
+        commentbroker.cpp \
+        commentinterface.cpp \
         jotting.cpp \
         jottingbroker.cpp \
         jottinginterface.cpp \
@@ -24,6 +27,9 @@ SOURCES += \
         relationalbroker.cpp
 
 HEADERS += \
+    comment.h \
+    commentbroker.h \
+    commentinterface.h \
     jotting.h \
     jottingbroker.h \
     jottinginterface.h \

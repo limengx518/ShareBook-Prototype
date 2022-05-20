@@ -9,7 +9,7 @@ class NetizenBroker:public RelationalBroker
 public:
     static NetizenBroker* getInstance();
     Netizen &findNetizenById(std::string id);
-    ~NetizenBroker();
+    virtual ~NetizenBroker();
 private:
     NetizenBroker();
 
