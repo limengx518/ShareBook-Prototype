@@ -10,7 +10,7 @@ public:
     explicit JottingInterface(const std::string &tid);
     virtual ~JottingInterface(){}
 
-    virtual nlohmann::json getJottingAbstract()= 0;
+    virtual nlohmann::json getAbstract()= 0;
     std::string id() const;
 private:
     std::string m_timeId;

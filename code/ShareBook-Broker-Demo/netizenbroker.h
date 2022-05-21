@@ -8,8 +8,12 @@ class NetizenBroker:public RelationalBroker
 {
 public:
     static NetizenBroker* getInstance();
-    Netizen &findNetizenById(std::string id);
+    Netizen *findById(std::string id);
     virtual ~NetizenBroker();
+
+    std::vector<std::string> findNetizenJotting(std::string netizenId);
+    std::vector<std::string> findNetizenFans(std::string netizenId);
+    std::vector<std::string> findNetizenConcereds(std::string netizenId);
 private:
     NetizenBroker();
 

@@ -9,14 +9,12 @@ NetizenProxy::NetizenProxy(const std::string &tid):
 
 NetizenProxy::~NetizenProxy()
 {
-    if(_netizen!=nullptr)
-        delete _netizen;
 }
 
 nlohmann::json NetizenProxy::getNetizenAbstract()
 {
     if(_netizen==nullptr){
-        _netizen=&NetizenBroker::getInstance()->findNetizenById(id());
+        _netizen=NetizenBroker::getInstance()->findById(id());
     }
     return _netizen->getNetizenAbstract();
 }

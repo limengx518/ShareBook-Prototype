@@ -9,15 +9,13 @@ JottingProxy::JottingProxy(const std::string &tid):
 
 JottingProxy::~JottingProxy()
 {
-    if(_jotting!=nullptr)
-        delete _jotting;
 }
 
 
-nlohmann::json JottingProxy::getJottingAbstract()
+nlohmann::json JottingProxy::getAbstract()
 {
-    if(_jotting==nullptr){
-        _jotting=&JottingBroker::getInstance()->findJottingById(id());
+    if(_jotting == nullptr){
+        _jotting = JottingBroker::getInstance()->findById(id());
     }
-     return _jotting->getJottingAbstract();
+     return _jotting->getAbstract();
 }

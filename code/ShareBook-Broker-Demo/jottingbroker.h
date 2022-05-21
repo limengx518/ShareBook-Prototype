@@ -11,10 +11,11 @@ class JottingBroker : public RelationalBroker
 {
 public:
     static JottingBroker *getInstance();
-    Jotting &findJottingById(std::string id);
+    Jotting *findById(std::string id);
     std::vector<std::string> getSomeJottingsId(std::string lastTime,std::string thisTime);
     void addNewJotting(Jotting * jotting);
     virtual ~JottingBroker(){}
+    std::vector<std::string> findMaterial(std::string jottingId);
 private:
     JottingBroker();
     static JottingBroker* m_jottingBroker;

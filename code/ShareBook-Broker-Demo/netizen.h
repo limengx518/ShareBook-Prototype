@@ -12,7 +12,7 @@ class Netizen:public NetizenInterface
 {
 public:
     explicit Netizen(const std::string& tid);
-    explicit Netizen(const std::string id,std::string nickName,std::vector<std::string> jottingId,std::vector<std::string> fansId,std::vector<std::string> conceredsId);
+    explicit Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId,std::vector<std::string> fansId, std::vector<std::string> conceredsId);
 
     virtual ~Netizen(){}
     void getInfo();

@@ -11,7 +11,7 @@ class JottingProxy : public JottingInterface
 public:
     explicit JottingProxy(const std::string &tid);
     virtual ~JottingProxy();
-    virtual nlohmann::json getJottingAbstract() override;
+    virtual nlohmann::json getAbstract() override;
 
 private:
     Jotting* _jotting;

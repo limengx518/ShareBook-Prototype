@@ -30,7 +30,8 @@ void Netizen::getInfo()
     json netizenInfo;
     netizenInfo["name"]=m_nickName;
     for(auto &jp:_jottings){
-        json jotting=jp.second.getJottingAbstract();
+        json jotting=jp.second.getAbstract();
+        netizenInfo["jottings"][jp.first]["netizen"]=jotting["netizen"];
         netizenInfo["jottings"][jp.first]["content"]=jotting["content"];
         netizenInfo["jottings"][jp.first]["material"]=jotting["material_firstPath"];
     }

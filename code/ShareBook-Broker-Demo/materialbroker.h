@@ -9,7 +9,7 @@ class MaterialBroker:public RelationalBroker
 {
 public:
     static MaterialBroker *getInstance();
-    Material &findMaterialById(std::string id);
+    Material *findById(std::string id);
     virtual ~MaterialBroker(){}
     void addNewMaterial(Material* material);
 private:

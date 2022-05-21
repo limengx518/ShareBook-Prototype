@@ -13,6 +13,6 @@ public:
     virtual nlohmann::json getNetizenAbstract() override;
 
 private:
-    Netizen *_netizen=nullptr;
+    Netizen *_netizen;
 };
 #endif // NETIZENPROXY_H

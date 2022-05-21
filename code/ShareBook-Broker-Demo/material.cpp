@@ -1,16 +1,17 @@
 #include "material.h"
 
-Material::Material(const std::string &tid):
-    MaterialInterface(tid)
+Material::Material(const std::string &tid, std::string jottingId):
+    MaterialInterface(tid),_jottingProxy(jottingId)
 {
 
 }
 
-Material::Material(const std::string id, std::string path):
-    MaterialInterface(id),m_path{path}
+Material::Material(const std::string id, std::string jottingId, std::string path):
+    MaterialInterface(id),_jottingProxy(jottingId),m_path(path)
 {
 
 }
+
 
 std::string Material::path()
 {

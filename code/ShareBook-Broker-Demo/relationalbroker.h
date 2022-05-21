@@ -13,15 +13,7 @@ public:
     void initDataBase();
     virtual ~RelationalBroker(){}
 
-    Jotting* findJottingById(std::string jottingId);
-    Netizen* findNetizenById(std::string netizenId);
-    Material* findMaterialById(std::string materialId);
-
-    std::vector<std::string> findNetizenJotting(std::string netizenId);
-    std::vector<std::string> findJottingMaterial(std::string jottingId);
-    std::vector<std::string> findNetizenFans(std::string netizenId);
-    std::vector<std::string> findNetizenConcereds(std::string netizenId);
-    std::vector<Jotting *> findSomeJottings(std::string lastTime,std::string thisTime);
+    sql::ResultSet* query(std::string command);
 
 private:
     std::unique_ptr<sql::Connection> m_connection;

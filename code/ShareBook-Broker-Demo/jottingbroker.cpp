@@ -10,30 +10,45 @@ JottingBroker *JottingBroker::getInstance()
     return m_jottingBroker;
 }
 
-Jotting &JottingBroker::findJottingById(std::string id)
+Jotting *JottingBroker::findById(std::string id)
 {
     auto search = _jottingsCache.find(id);
     if(search == _jottingsCache.end()){
+
+        std::string command="select * from Jotting where J_id="+id;
+        sql::ResultSet* res=RelationalBroker::query(command);
+        std::string id,content,nid;
+         // Loop through and print results
+        while (res->next()) {
+            id=std::to_string(res->getInt(1));
+            content=res->getString(2);
+            nid=std::to_string(res->getInt(3));
+        }
         //retrieveJotting(id)
-        Jotting jotting=*(RelationalBroker::findJottingById(id));
-        _jottingsCache.insert(std::pair<std::string,Jotting>(id,jotting));
+        Jotting *jotting=new Jotting(id,content,nid,findMaterial(id));
+
+        _jottingsCache.insert(std::pair<std::string,Jotting>(id,*jotting));
+        return jotting;
     }
-    return _jottingsCache.at(id);
+    return &_jottingsCache.at(id);
 }
 
-std::vector<std::string> JottingBroker::getSomeJottingsId(std::string lastTime, std::string thisTime)
-{
-    std::vector<std::string>idVector;
-    for(auto &jotting:RelationalBroker::findSomeJottings(lastTime,thisTime)){
-        _jottingsCache.insert(std::pair<std::string,Jotting>(jotting->id(),*jotting));
-        idVector.push_back(jotting->id());
-    }
-    return idVector;
-}
+
 
 void JottingBroker::addNewJotting(Jotting *jotting)
 {
     _jottingsCache.insert(std::pair<std::string,Jotting>(jotting->id(),*jotting));
+}
+
+std::vector<std::string> JottingBroker::findMaterial(std::string id)
+{
+    std::vector<std::string> materialIds;
+std::string com="select M_id from Material where J_id="+id;
+    sql::ResultSet* res=RelationalBroker::query(com);
+    while (res->next()) {
+        materialIds.push_back(std::to_string(res->getInt(1)));
+    }
+    return materialIds;
 }
 
 JottingBroker::JottingBroker()

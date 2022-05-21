@@ -23,195 +23,97 @@ RelationalBroker::RelationalBroker()
 void RelationalBroker::initDataBase()
 {
     try {
-//        std::unique_ptr<sql::PreparedStatement> stmnt(m_connection->prepareStatement("create table Netizen (N_id INT(11) unsigned NOT NULL AUTO_INCREMENT,N_nickName varchar(20) not null,primary key(N_id))"));
-//        stmnt->executeQuery();
-//        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table Jotting (J_id INT(11) unsigned NOT NULL AUTO_INCREMENT,J_content varchar(2000) not null,N_id INT(11) unsigned not null,primary key(J_id),foreign key(N_id) references Netizen(N_id) on delete cascade on update cascade)"));
-//        stmnt2->executeQuery();
-//        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table Material (M_id INT(11) unsigned NOT NULL AUTO_INCREMENT,M_path varchar(100) not null,J_id INT(11) unsigned not null,primary key(M_id),foreign key(J_id) references Jotting(J_id) on delete cascade on update cascade)"));
-//        stmnt2->executeQuery();
-//        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table Relation (R_id INT(11) unsigned NOT NULL,N_Fan_id INT(11) unsigned NOT NULL,primary key (R_id,N_Fan_id),foreign key(R_id) references Netizen(N_id) on delete cascade on update cascade,foreign key(N_Fan_id) references Netizen(N_id) on delete cascade on update cascade)"));
-//        stmnt2->executeQuery();
-//        std::unique_ptr<sql::PreparedStatement> stmnt(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(2,1)"));
-//        stmnt->executeQuery();
-//        std::unique_ptr<sql::PreparedStatement> stmnt1(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(1,3)"));
-//        stmnt1->executeQuery();
-        std::unique_ptr<sql::PreparedStatement> stmnt3(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(4,1)"));
+
+        //创造表
+        std::unique_ptr<sql::PreparedStatement> stmnt(m_connection->prepareStatement("create table if not exists Netizen(N_id INT(15) unsigned AUTO_INCREMENT,N_nickName varchar(20) not null,primary key(N_id))"));
+        stmnt->executeQuery();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table if not exists Jotting (J_id INT(15) unsigned NOT NULL ,J_content varchar(2000) not null,N_id INT(15) unsigned not null,primary key(J_id),foreign key(N_id) references Netizen(N_id) on delete cascade on update cascade)"));
+        stmnt2->executeQuery();
+
+
+        std::unique_ptr<sql::PreparedStatement> stmnt3(m_connection->prepareStatement("create table if not exists Material (M_id INT(15) unsigned NOT NULL ,M_path varchar(100) not null,J_id INT(15) unsigned not null,primary key(M_id),foreign key(J_id) references Jotting(J_id) on delete cascade on update cascade)"));
         stmnt3->executeQuery();
+
+
+        std::unique_ptr<sql::PreparedStatement> stmnt4(m_connection->prepareStatement("create table if not exists Relation (R_id INT(15) unsigned NOT NULL,N_Fan_id INT(15) unsigned NOT NULL,primary key (R_id,N_Fan_id),foreign key(R_id) references Netizen(N_id) on delete cascade on update cascade,foreign key(N_Fan_id) references Netizen(N_id) on delete cascade on update cascade)"));
+        stmnt4->executeQuery();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt7(m_connection->prepareStatement("insert into Netizen (N_id,N_nickName) values(?,?)"));
+        stmnt7->setInt(1,1);
+        stmnt7->setString(2,"rose");
+        stmnt7->execute();
+
+        stmnt7->setInt(1,2);
+        stmnt7->setString(2,"Monica");
+        stmnt7->execute();
+
+        stmnt7->setInt(1,3);
+        stmnt7->setString(2,"Phoebe");
+        stmnt7->execute();
+
+        stmnt7->setInt(1,4);
+        stmnt7->setString(2,"Joey");
+        stmnt7->execute();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt8(m_connection->prepareStatement("insert into Jotting (J_id,J_content,N_id) values(?,?,?)"));
+
+        stmnt8->setInt(1,1);
+        stmnt8->setString(2,"wind wind flower");
+        stmnt8->setInt(3,1);
+        stmnt8->execute();
+
+        stmnt8->setInt(1,2);
+        stmnt8->setString(2,"Turn it up now hear me");
+        stmnt8->setInt(3,2);
+        stmnt8->execute();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt6(m_connection->prepareStatement("insert into Material (M_id,M_path,J_id) values(?,?,?)"));
+
+        stmnt6->setInt(1,1);
+        stmnt6->setString(2,"picturePath1");
+        stmnt6->setInt(3,1);
+        stmnt6->execute();
+
+        stmnt6->setInt(1,2);
+        stmnt6->setString(2,"videoPath1");
+        stmnt6->setInt(3,2);
+        stmnt6->execute();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt5(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(?,?)"));
+
+        stmnt5->setInt(1,1);
+        stmnt5->setInt(2,3);
+        stmnt5->execute();
+
+        stmnt5->setInt(1,2);
+        stmnt5->setInt(2,1);
+        stmnt5->execute();
+
+        stmnt5->setInt(1,4);
+        stmnt5->setInt(2,1);
+        stmnt5->execute();
+
     }catch(sql::SQLException& e){
-        std::cerr << "Error inserting new task: " << e.what() << std::endl;
+        std::cerr<< e.what() << std::endl;
     }
 }
 
-Jotting *RelationalBroker::findJottingById(std::string jottingId)
+sql::ResultSet* RelationalBroker::query(std::string command)
 {
-    std::string com="select * from Jotting where J_id="+jottingId;
-    Jotting *jotting=nullptr;
     try {
             // Create a new Statement
         std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
             // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
+        sql::ResultSet *res = stmnt->executeQuery(command);
+        return res;
 
-        std::string id,content;
-            // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getInt(1));
-            content=res->getString(2);
-        }
-        jotting=new Jotting(id,content,findJottingMaterial(id));
     }catch(sql::SQLException& e){
         std::cerr << "Error selecting tasks: " << e.what() << std::endl;
     }
-    return jotting;
+    return nullptr;
 }
 
-Netizen *RelationalBroker::findNetizenById(std::string netizenId)
-{
-    std::string com="select * from Netizen where N_id="+netizenId;
-    Netizen *netizen=nullptr;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
 
-        std::string id,nickName;
-            // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getInt(1));
-            nickName=res->getString(2);
-        }
 
-        netizen=new Netizen(id,nickName,findNetizenJotting(id),findNetizenFans(id),findNetizenConcereds(id));
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return netizen;
-}
 
-Material *RelationalBroker::findMaterialById(std::string materialId)
-{
-    std::string com="select * from Material where J_id="+materialId;
-    Material *material=nullptr;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-
-        std::string id,path;
-            // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getInt(1));
-            path=res->getString(2);
-        }
-
-        material=new Material(id,path);
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return material;
-}
-
-std::vector<std::string> RelationalBroker::findNetizenJotting(std::string netizenId)
-{
-    std::string com="select J_id from Jotting where N_id="+netizenId;
-    std::vector<std::string> jottingIds;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-            // Loop through and print results
-        while (res->next()) {
-            jottingIds.push_back(std::to_string(res->getInt(1)));
-        }
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return jottingIds;
-}
-
-std::vector<std::string> RelationalBroker::findJottingMaterial(std::string jottingId)
-{
-    std::string com="select M_id from Material where J_id="+jottingId;
-    std::vector<std::string> materialIds;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-
-            // Loop through and print results
-        while (res->next()) {
-            materialIds.push_back(std::to_string(res->getInt(1)));
-        }
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return materialIds;
-}
-
-std::vector<std::string> RelationalBroker::findNetizenFans(std::string netizenId)
-{
-    std::string com="select N_Fan_id from Relation where R_id="+netizenId;
-    std::vector<std::string> fansIds;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-
-            // Loop through and print results
-        while (res->next()) {
-            fansIds.push_back(std::to_string(res->getInt(1)));
-        }
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return fansIds;
-}
-
-std::vector<std::string> RelationalBroker::findNetizenConcereds(std::string netizenId)
-{
-    std::string com="select R_id from Relation where N_Fan_id="+netizenId;
-    std::vector<std::string> conceredIds;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-
-            // Loop through and print results
-        while (res->next()) {
-            conceredIds.push_back(std::to_string(res->getInt(1)));
-        }
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return conceredIds;
-}
-
-std::vector<Jotting *> RelationalBroker::findSomeJottings(std::string lastTime, std::string thisTime)
-{
-    Jotting *jotting=nullptr;
-    std::string com="select * from Jotting where J_id between "+ lastTime +" and "+thisTime; //一定时间段的笔记
-    std::vector<Jotting *> jottings;
-    std::string id,content;
-    try {
-            // Create a new Statement
-        std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
-        sql::ResultSet *res = stmnt->executeQuery(com);
-            // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getInt(1));
-            content=res->getString(2);
-            jotting=new Jotting(id,content,findJottingMaterial(id));
-            jottings.push_back(jotting);
-        }
-    }catch(sql::SQLException& e){
-        std::cerr << "Error selecting tasks: " << e.what() << std::endl;
-    }
-    return jottings;
-}

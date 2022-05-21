@@ -9,15 +9,13 @@ MaterialProxy::MaterialProxy(const std::string &tid):
 
 MaterialProxy::~MaterialProxy()
 {
-    if(_material!=nullptr)
-        delete _material;
 }
 
 
 std::string MaterialProxy::getMaterialAbstract()
 {
     if(_material==nullptr){
-        _material=&(MaterialBroker::getInstance())->findMaterialById(id());
+        _material=MaterialBroker::getInstance()->findById(id());
     }
      return _material->getMaterialAbstract();
 }
