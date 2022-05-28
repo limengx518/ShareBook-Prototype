@@ -36,11 +36,11 @@ void Netizen::getInfo()
         netizenInfo["jottings"][jp.first]["material"]=jotting["material_firstPath"];
     }
     for(auto &fp:_fans){
-       json netizenAbstract=fp.second.getNetizenAbstract();
+       json netizenAbstract=fp.second.getAbstract();
        netizenInfo["fans"][fp.first]["nickName"]=netizenAbstract["nickName"];
     }
     for(auto &cp:_concerneds){
-       json netizenAbstract=cp.second.getNetizenAbstract();
+       json netizenAbstract=cp.second.getAbstract();
        netizenInfo["concerneds"][cp.first]["nickName"]=netizenAbstract["nickName"];
     }
     std::cout<<netizenInfo.dump(4)<<std::endl;
@@ -51,7 +51,7 @@ std::string Netizen::nickName()
     return m_nickName;
 }
 
-nlohmann::json Netizen::getNetizenAbstract()
+nlohmann::json Netizen::getAbstract()
 {
     json j;
     j["nickName"]=m_nickName;

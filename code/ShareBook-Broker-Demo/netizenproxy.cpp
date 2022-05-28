@@ -11,10 +11,10 @@ NetizenProxy::~NetizenProxy()
 {
 }
 
-nlohmann::json NetizenProxy::getNetizenAbstract()
+nlohmann::json NetizenProxy::getAbstract()
 {
     if(_netizen==nullptr){
         _netizen=NetizenBroker::getInstance()->findById(id());
     }
-    return _netizen->getNetizenAbstract();
+    return _netizen->getAbstract();
 }

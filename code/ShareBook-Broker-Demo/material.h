@@ -12,7 +12,7 @@ public:
     virtual ~Material(){}
     std::string path();
 
-    virtual std::string getMaterialAbstract() override;
+    virtual std::string getAbstract() override;
 private:
     JottingProxy _jottingProxy;
     std::string m_path;

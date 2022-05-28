@@ -18,7 +18,7 @@ std::string Material::path()
     return m_path;
 }
 
-std::string Material::getMaterialAbstract()
+std::string Material::getAbstract()
 {
     return m_path;
 }

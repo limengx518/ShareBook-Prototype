@@ -11,7 +11,7 @@ class MaterialProxy:public MaterialInterface
 public:
     explicit MaterialProxy(const std::string &tid);
     virtual ~MaterialProxy();
-    virtual std::string getMaterialAbstract() override;
+    virtual std::string getAbstract() override;
 
 private:
     Material *_material;

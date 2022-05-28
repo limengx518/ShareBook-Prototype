@@ -18,7 +18,7 @@ public:
     void getInfo();
 
     std::string nickName();
-    virtual nlohmann::json getNetizenAbstract() override;
+    virtual nlohmann::json getAbstract() override;
 
 private:
     std::string m_nickName;

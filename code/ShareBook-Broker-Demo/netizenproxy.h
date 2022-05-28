@@ -10,7 +10,7 @@ class NetizenProxy:public NetizenInterface
 public:
     explicit NetizenProxy(const std::string &tid);
     virtual ~NetizenProxy();
-    virtual nlohmann::json getNetizenAbstract() override;
+    virtual nlohmann::json getAbstract() override;
 
 private:
     Netizen *_netizen;

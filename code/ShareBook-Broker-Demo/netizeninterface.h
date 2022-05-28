@@ -10,7 +10,7 @@ public:
     explicit NetizenInterface(const std::string &tid);
     virtual ~NetizenInterface(){}
 
-    virtual nlohmann::json getNetizenAbstract()  = 0;
+    virtual nlohmann::json getAbstract()  = 0;
     std::string id() const;
 private:
     std::string m_id;

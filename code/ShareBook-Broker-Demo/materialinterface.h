@@ -9,7 +9,7 @@ public:
     explicit MaterialInterface(const std::string &tid);
     virtual  ~MaterialInterface(){}
 
-    virtual std::string getMaterialAbstract()  = 0;
+    virtual std::string getAbstract()  = 0;
     std::string id() const;
 private:
     std::string m_timeId;

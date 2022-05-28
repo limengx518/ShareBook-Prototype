@@ -24,7 +24,7 @@ nlohmann::json Jotting::getAbstract()
 {
     json j;
     j["content"]=m_note;
-    j["material_firstPath"]=_materials.begin()->second.getMaterialAbstract();
-    j["netizen"]=_netizenProxy.getNetizenAbstract();
+    j["material_firstPath"]=_materials.begin()->second.getAbstract();
+    j["netizen"]=_netizenProxy.getAbstract();
     return j;
 }

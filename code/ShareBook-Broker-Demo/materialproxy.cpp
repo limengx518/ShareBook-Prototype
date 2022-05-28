@@ -12,10 +12,10 @@ MaterialProxy::~MaterialProxy()
 }
 
 
-std::string MaterialProxy::getMaterialAbstract()
+std::string MaterialProxy::getAbstract()
 {
     if(_material==nullptr){
         _material=MaterialBroker::getInstance()->findById(id());
     }
-     return _material->getMaterialAbstract();
+     return _material->getAbstract();
 }
