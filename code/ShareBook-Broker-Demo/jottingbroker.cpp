@@ -33,6 +33,7 @@ Jotting *JottingBroker::findById(std::string id)
         storeObject(*jotting);
         return jotting;
     }
+    std::cout<<"in cache"<<std::endl;
     return jotting;
 }
 
@@ -52,7 +53,7 @@ Jotting* JottingBroker::inCache(std::string objectId)
     std::unordered_map<std::string,std::string> m=RelationalBroker::inCache("jotting"+objectId);
     if(m.empty())
         return nullptr;
-    std::stringstream materialsId(m["materiId"]);
+    std::stringstream materialsId(m["materialId"]);
     std::string id;
     std::vector<std::string> materials;
     while(std::getline(materialsId,id,',')){

@@ -37,11 +37,11 @@ Material *MaterialBroker::findById(std::string id)
 
 Material *MaterialBroker::inCache(std::string objectId)
 {
-    std::unordered_map<std::string,std::string> map=RelationalBroker::inCache(objectId);
+    std::unordered_map<std::string,std::string> map=RelationalBroker::inCache("material"+objectId);
     if(map.empty()){
         return nullptr;
     }
-    Material* material=new Material("material"+objectId,map["jottingId"],map["path"]);
+    Material* material=new Material(objectId,map["jottingId"],map["path"]);
     return material;
 }
 
