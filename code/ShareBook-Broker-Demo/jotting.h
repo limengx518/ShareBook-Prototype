@@ -16,6 +16,11 @@ public:
 
     virtual nlohmann::json getAbstract() override;
 
+
+    const std::string note() const;
+    const std::string netizenId() const;
+    const std::vector<std::string> materialId() const;
+
 private:
     NetizenProxy _netizenProxy;
     std::unordered_map<std::string, MaterialProxy> _materials;

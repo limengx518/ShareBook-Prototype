@@ -114,6 +114,16 @@ sql::ResultSet* RelationalBroker::query(std::string command)
     return nullptr;
 }
 
+std::unordered_map<std::string, std::string> RelationalBroker::inCache(std::string objectId)
+{
+    return m_cache.inCache(objectId);
+}
+
+void RelationalBroker::storeObject(std::string key, std::unordered_map<std::string, std::string> map)
+{
+    m_cache.storeObject(key,map);
+}
+
 
 
 

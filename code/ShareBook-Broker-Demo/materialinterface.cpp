@@ -6,7 +6,7 @@ MaterialInterface::MaterialInterface(const std::string &tid):
 
 }
 
-std::string MaterialInterface::id() const
+const std::string MaterialInterface::id() const
 {
     return m_timeId;
 }

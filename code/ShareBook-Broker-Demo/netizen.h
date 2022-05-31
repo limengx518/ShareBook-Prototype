@@ -17,7 +17,11 @@ public:
     virtual ~Netizen(){}
     void getInfo();
 
-    std::string nickName();
+    const std::string nickName()const;
+    const std::vector<std::string> jottings() const;
+    const std::vector<std::string> fans() const;
+    const std::vector<std::string> concerneds() const;
+
     virtual nlohmann::json getAbstract() override;
 
 private:

@@ -28,3 +28,22 @@ nlohmann::json Jotting::getAbstract()
     j["netizen"]=_netizenProxy.getAbstract();
     return j;
 }
+
+const std::string Jotting::note() const
+{
+    return m_note;
+}
+
+const std::string Jotting::netizenId() const
+{
+    return _netizenProxy.id();
+}
+
+const std::vector<std::string> Jotting::materialId() const
+{
+    std::vector<std::string> vector;
+    for(const auto &item:_materials){
+        vector.push_back(item.first);
+    }
+    return vector;
+}

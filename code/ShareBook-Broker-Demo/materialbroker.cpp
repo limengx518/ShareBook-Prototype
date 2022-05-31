@@ -1,4 +1,5 @@
 #include "materialbroker.h"
+#include <unordered_map>
 
 MaterialBroker* MaterialBroker::m_materialBroker=NULL;
 
@@ -12,8 +13,9 @@ MaterialBroker *MaterialBroker::getInstance()
 
 Material *MaterialBroker::findById(std::string id)
 {
-    auto search = _materialsCache.find(id);
-    if(search == _materialsCache.end()){
+    Material* material=inCache(id);
+    if(material==nullptr){
+
         std::string command="select * from Material where J_id="+id;
         sql::ResultSet* res=RelationalBroker::query(command);
         std::string id,path,jId;
@@ -25,15 +27,34 @@ Material *MaterialBroker::findById(std::string id)
         }
         //retrieveJotting(id)
         Material* material=new Material(id,jId,path);
-        _materialsCache.insert(std::pair<std::string,Material>(id,*material));
+
+        storeObject(*material);
+
+        return material;
     }
-     return &_materialsCache.at(id);
+    return material;
 }
 
-void MaterialBroker::addNewMaterial(Material *material)
+Material *MaterialBroker::inCache(std::string objectId)
 {
-    _materialsCache.insert(std::pair<std::string,Material>(material->id(),*material));
+    std::unordered_map<std::string,std::string> map=RelationalBroker::inCache(objectId);
+    if(map.empty()){
+        return nullptr;
+    }
+    Material* material=new Material("material"+objectId,map["jottingId"],map["path"]);
+    return material;
 }
+
+void MaterialBroker::storeObject(const Material &material)
+{
+    std::unordered_map<std::string,std::string> map{
+        {"id",material.id()},
+        {"path",material.path()},
+        {"jottingId",material.jottingId()}
+    };
+    RelationalBroker::storeObject("material"+material.id(),map);
+}
+
 
 MaterialBroker::MaterialBroker()
 {

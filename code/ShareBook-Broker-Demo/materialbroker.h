@@ -4,18 +4,23 @@
 #include "relationalbroker.h"
 #include "material.h"
 #include <unordered_map>
+#include "cache.h"
 
 class MaterialBroker:public RelationalBroker
 {
 public:
     static MaterialBroker *getInstance();
+
     Material *findById(std::string id);
-    virtual ~MaterialBroker(){}
-    void addNewMaterial(Material* material);
+
+    Material* inCache(std::string objectId);
+    void storeObject(const Material& material);
+
+    virtual ~MaterialBroker(){};
 private:
     MaterialBroker();
     static MaterialBroker* m_materialBroker;
-    std::unordered_map<std::string, Material> _materialsCache;
+//    std::unordered_map<std::string, Material> _materialsCache;
 };
 
 #endif // MATERIALBROKER_H

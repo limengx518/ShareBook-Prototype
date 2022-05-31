@@ -1,4 +1,8 @@
 #include "jottingbroker.h"
+#include <unordered_map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 JottingBroker* JottingBroker::m_jottingBroker=NULL;
 
@@ -12,9 +16,8 @@ JottingBroker *JottingBroker::getInstance()
 
 Jotting *JottingBroker::findById(std::string id)
 {
-    auto search = _jottingsCache.find(id);
-    if(search == _jottingsCache.end()){
-
+    Jotting* jotting=inCache(id);
+    if(jotting == nullptr){
         std::string command="select * from Jotting where J_id="+id;
         sql::ResultSet* res=RelationalBroker::query(command);
         std::string id,content,nid;
@@ -27,17 +30,10 @@ Jotting *JottingBroker::findById(std::string id)
         //retrieveJotting(id)
         Jotting *jotting=new Jotting(id,content,nid,findMaterial(id));
 
-        _jottingsCache.insert(std::pair<std::string,Jotting>(id,*jotting));
+        storeObject(*jotting);
         return jotting;
     }
-    return &_jottingsCache.at(id);
-}
-
-
-
-void JottingBroker::addNewJotting(Jotting *jotting)
-{
-    _jottingsCache.insert(std::pair<std::string,Jotting>(jotting->id(),*jotting));
+    return jotting;
 }
 
 std::vector<std::string> JottingBroker::findMaterial(std::string id)
@@ -49,6 +45,38 @@ std::string com="select M_id from Material where J_id="+id;
         materialIds.push_back(std::to_string(res->getInt(1)));
     }
     return materialIds;
+}
+
+Jotting* JottingBroker::inCache(std::string objectId)
+{
+    std::unordered_map<std::string,std::string> m=RelationalBroker::inCache("jotting"+objectId);
+    if(m.empty())
+        return nullptr;
+    std::stringstream materialsId(m["materiId"]);
+    std::string id;
+    std::vector<std::string> materials;
+    while(std::getline(materialsId,id,',')){
+        materials.push_back(id);
+    }
+    Jotting* jotting=new Jotting(objectId,m["note"],m["netizenId"],materials);
+
+    return jotting;
+}
+
+void JottingBroker::storeObject(const Jotting &jotting)
+{
+    std::vector<std::string> vector=jotting.materialId();
+    std::string materialsId="";
+    for(const auto &item:vector){
+        materialsId+=item;
+        materialsId+=",";
+    }
+    std::unordered_map<std::string,std::string> map{
+        {"note", jotting.note()},
+        {"netizenId", jotting.netizenId()},
+        {"materialId",materialsId}
+    };
+    RelationalBroker::storeObject("jotting"+jotting.id(),map);
 }
 
 JottingBroker::JottingBroker()

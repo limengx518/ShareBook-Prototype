@@ -3,10 +3,11 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS+=-lmariadbcpp
+LIBS+=-lmariadbcpp -lredis++ -lhiredis -pthread
 
 
 SOURCES += \
+        cache.cpp \
         jotting.cpp \
         jottingbroker.cpp \
         jottinginterface.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
         relationalbroker.cpp
 
 HEADERS += \
+    cache.h \
     jotting.h \
     jottingbroker.h \
     jottinginterface.h \

@@ -12,28 +12,26 @@ NetizenBroker *NetizenBroker::getInstance()
 
 Netizen *NetizenBroker::findById(std::string id)
 {
-    auto search = _netizensCache.find(id);
-    if(search == _netizensCache.end()){
-            std::string com="select * from Netizen where N_id="+id;
-            std::string id,nickName;
-            sql::ResultSet* res=RelationalBroker::query(com);
-                // Loop through and print results
-            while (res->next()) {
-                id=std::to_string(res->getInt(1));
-                nickName=res->getString(2);
-            }
+    Netizen * netizen=inCache(id);
+    if(netizen==nullptr){
+        std::string com="select * from Netizen where N_id="+id;
+        std::string id,nickName;
+        sql::ResultSet* res=RelationalBroker::query(com);
+        // Loop through and print results
+        while (res->next()) {
+            id=std::to_string(res->getInt(1));
+            nickName=res->getString(2);
+        }
         //retrieveJotting(id)
         Netizen* netizen=new Netizen(id,nickName,findNetizenJotting(id),findNetizenFans(id),findNetizenConcereds(id));
-        _netizensCache.insert(std::pair<std::string,Netizen>(id,*netizen));
+
+        storeObject(*netizen);
+
+        return netizen;
     }
-    return &_netizensCache.at(id);
+    return netizen;
 }
 
-NetizenBroker::~NetizenBroker()
-{
-    if(m_netizenBroker!=nullptr)
-        delete m_netizenBroker;
-}
 
 std::vector<std::string> NetizenBroker::findNetizenJotting(std::string netizenId)
 {
@@ -69,6 +67,60 @@ std::vector<std::string> NetizenBroker::findNetizenConcereds(std::string netizen
      }
     return conceredIds;
 
+}
+
+Netizen *NetizenBroker::inCache(std::string objectId)
+{
+    std::unordered_map<std::string,std::string> map=RelationalBroker::inCache("netizen"+objectId);
+    if(map.empty())
+        return nullptr;
+    std::stringstream jottingsId(map["jottingsId"]);
+    std::stringstream concernedsId(map["concernedsId"]);
+    std::stringstream fansId(map["fansId"]);
+    std::string id;
+    std::vector<std::string> jottings;
+    while(std::getline(jottingsId,id,',')){
+        jottings.push_back(id);
+    }
+    std::vector<std::string> concerneds;
+    while(std::getline(concernedsId,id,',')){
+        concerneds.push_back(id);
+    }
+    std::vector<std::string> fans;
+    while(std::getline(fansId,id,',')){
+        fans.push_back(id);
+    }
+    Netizen * netizen=new Netizen(objectId,map["nickName"],jottings,fans,concerneds);
+    return netizen;
+}
+
+void NetizenBroker::storeObject(const Netizen &netizen)
+{
+    std::vector<std::string> jottings=netizen.jottings();
+    std::vector<std::string> fans=netizen.fans();
+    std::vector<std::string> concerneds=netizen.concerneds();
+    std::string jottingsId,fansId,concernedsId;
+    for(const auto& item:jottings){
+        jottingsId+=item;
+        jottingsId+=",";
+    }
+    for(const auto& item:fans){
+        fansId+=item;
+        fansId+=",";
+    }
+    for(const auto& item:concerneds){
+        concernedsId+=item;
+        concernedsId+=",";
+    }
+    std::unordered_map<std::string,std::string> map{
+        {"id",netizen.id()},
+        {"nickName",netizen.nickName()},
+        {"jottingsId",jottingsId},
+        {"fansId",fansId},
+        {"concernedsId",concernedsId}
+    };
+
+    RelationalBroker::storeObject("netizen"+netizen.id(),map);
 }
 
 NetizenBroker::NetizenBroker()

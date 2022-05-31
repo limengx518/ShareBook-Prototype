@@ -12,13 +12,17 @@ Material::Material(const std::string id, std::string jottingId, std::string path
 
 }
 
+const std::string Material::jottingId() const
+{
+    return _jottingProxy.id();
+}
 
-std::string Material::path()
+std::string Material::getAbstract()
 {
     return m_path;
 }
 
-std::string Material::getAbstract()
+const std::string &Material::path() const
 {
     return m_path;
 }

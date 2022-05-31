@@ -10,7 +10,7 @@ public:
     virtual  ~MaterialInterface(){}
 
     virtual std::string getAbstract()  = 0;
-    std::string id() const;
+    const std::string id() const;
 private:
     std::string m_timeId;
 };

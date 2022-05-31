@@ -46,9 +46,36 @@ void Netizen::getInfo()
     std::cout<<netizenInfo.dump(4)<<std::endl;
 }
 
-std::string Netizen::nickName()
+const std::string Netizen::nickName()const
 {
     return m_nickName;
+}
+
+const std::vector<std::string> Netizen::jottings() const
+{
+    std::vector<std::string> jottings;
+    for(const auto& item:_jottings){
+        jottings.push_back(item.first);
+    }
+    return jottings;
+}
+
+const std::vector<std::string> Netizen::fans() const
+{
+    std::vector<std::string> fans;
+    for(const auto& item:_fans){
+        fans.push_back(item.first);
+    }
+    return fans;
+}
+
+const std::vector<std::string> Netizen::concerneds() const
+{
+    std::vector<std::string> concerneds;
+    for(const auto& item:_concerneds){
+        concerneds.push_back(item.first);
+    }
+    return concerneds;
 }
 
 nlohmann::json Netizen::getAbstract()
