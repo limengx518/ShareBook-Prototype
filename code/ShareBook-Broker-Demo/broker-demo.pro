@@ -8,6 +8,10 @@ LIBS+=-lmariadbcpp -lredis++ -lhiredis -pthread
 
 SOURCES += \
         cache.cpp \
+        comment.cpp \
+        commentbroker.cpp \
+        commentinterface.cpp \
+        commentproxy.cpp \
         jotting.cpp \
         jottingbroker.cpp \
         jottinginterface.cpp \
@@ -26,6 +30,10 @@ SOURCES += \
 
 HEADERS += \
     cache.h \
+    comment.h \
+    commentbroker.h \
+    commentinterface.h \
+    commentproxy.h \
     jotting.h \
     jottingbroker.h \
     jottinginterface.h \

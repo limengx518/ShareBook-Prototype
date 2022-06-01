@@ -13,6 +13,5 @@ int main()
 //        JottingBroker * broker=JottingBroker::getInstance();
 //        broker->initDataBase();
     JottingSocialControl control("1");
-//    Cache cache;
     return 0;
 }

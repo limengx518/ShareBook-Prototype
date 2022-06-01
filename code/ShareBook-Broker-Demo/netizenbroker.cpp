@@ -23,7 +23,7 @@ Netizen *NetizenBroker::findById(std::string id)
             nickName=res->getString(2);
         }
         //retrieveJotting(id)
-        Netizen* netizen=new Netizen(id,nickName,findNetizenJotting(id),findNetizenFans(id),findNetizenConcereds(id));
+        Netizen* netizen=new Netizen(id,nickName,findNetizenJotting(id),findNetizenFans(id),findNetizenConcereds(id),findNetizenComments(id));
 
         storeObject(*netizen);
 
@@ -69,6 +69,18 @@ std::vector<std::string> NetizenBroker::findNetizenConcereds(std::string netizen
 
 }
 
+std::vector<std::string> NetizenBroker::findNetizenComments(std::string netizenId)
+{
+    std::string com="select C_id from Comment where J_id="+netizenId;
+    std::vector<std::string> commentIds;
+    sql::ResultSet* res=RelationalBroker::query(com);
+
+     while (res->next()) {
+         commentIds.push_back(std::to_string(res->getInt(1)));
+     }
+    return commentIds;
+}
+
 Netizen *NetizenBroker::inCache(std::string objectId)
 {
     std::unordered_map<std::string,std::string> map=RelationalBroker::inCache("netizen"+objectId);
@@ -77,6 +89,7 @@ Netizen *NetizenBroker::inCache(std::string objectId)
     std::stringstream jottingsId(map["jottingsId"]);
     std::stringstream concernedsId(map["concernedsId"]);
     std::stringstream fansId(map["fansId"]);
+    std::stringstream commentsId(map["commentsId"]);
     std::string id;
     std::vector<std::string> jottings;
     while(std::getline(jottingsId,id,',')){
@@ -90,7 +103,11 @@ Netizen *NetizenBroker::inCache(std::string objectId)
     while(std::getline(fansId,id,',')){
         fans.push_back(id);
     }
-    Netizen * netizen=new Netizen(objectId,map["nickName"],jottings,fans,concerneds);
+    std::vector<std::string> comments;
+    while(std::getline(commentsId,id,',')){
+        comments.push_back(id);
+    }
+    Netizen * netizen=new Netizen(objectId,map["nickName"],jottings,fans,concerneds,comments);
     return netizen;
 }
 
@@ -99,7 +116,7 @@ void NetizenBroker::storeObject(const Netizen &netizen)
     std::vector<std::string> jottings=netizen.jottings();
     std::vector<std::string> fans=netizen.fans();
     std::vector<std::string> concerneds=netizen.concerneds();
-    std::string jottingsId,fansId,concernedsId;
+    std::string jottingsId,fansId,concernedsId,commentsId;
     for(const auto& item:jottings){
         jottingsId+=item;
         jottingsId+=",";
@@ -112,12 +129,17 @@ void NetizenBroker::storeObject(const Netizen &netizen)
         concernedsId+=item;
         concernedsId+=",";
     }
+    for(const auto& item:concerneds){
+        commentsId+=item;
+        commentsId=",";
+    }
     std::unordered_map<std::string,std::string> map{
         {"id",netizen.id()},
         {"nickName",netizen.nickName()},
         {"jottingsId",jottingsId},
         {"fansId",fansId},
-        {"concernedsId",concernedsId}
+        {"concernedsId",concernedsId},
+        {"commentsId",commentsId}
     };
 
     RelationalBroker::storeObject("netizen"+netizen.id(),map);

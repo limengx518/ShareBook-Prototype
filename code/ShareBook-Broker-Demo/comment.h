@@ -1,26 +1,30 @@
 #ifndef COMMENT_H
 #define COMMENT_H
 
-#include <string>
-#include <vector>
 #include <unordered_map>
-#include <nlohmann/json.hpp>
-#include "materialproxy.h"
-#include "jottingproxy.h"
-#include "commentinterface.h"
-#include "netizen.h"
+#include <vector>
 
-class Comment:public CommentInterface
+#include "commentinterface.h"
+#include "jottingproxy.h"
+#include "materialproxy.h"
+#include "netizenproxy.h"
+
+class Comment: public CommentInterface
 {
 public:
-    explicit Comment(const std::string id,std::string netizenId,std::string jottingId);
+//    explicit Comment(const std::string &tid,std::string publisherId);
+    explicit Comment(const std::string id,std::string content,std::string publisherId,std::string jottingId);
     virtual ~Comment(){}
 
-    virtual nlohmann::json getCommentDetail() override;
+    virtual nlohmann::json getInfo() override;
+
+    const std::string content() const;
+    const std::string publisherId() const;
+    const std::string jottingId() const;
 
 private:
-    NetizenProxy _netizen;
-    JottingProxy _jotting;
+    NetizenProxy _netizenProxy;
+    JottingProxy _jottingProxy;
     std::string m_content;
 };
 

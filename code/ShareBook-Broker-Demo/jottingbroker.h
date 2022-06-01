@@ -16,6 +16,7 @@ public:
     Jotting *findById(std::string id);
     std::vector<std::string> getSomeJottingsId(std::string lastTime,std::string thisTime);
     std::vector<std::string> findMaterial(std::string jottingId);
+    std::vector<std::string> findComment(std::string jottingId);
 
     Jotting* inCache(std::string objectId);
     void storeObject(const Jotting& jotting);

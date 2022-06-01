@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include "commentproxy.h"
 #include "jottingproxy.h"
 #include <vector>
 #include "netizeninterface.h"
@@ -12,7 +13,7 @@ class Netizen:public NetizenInterface
 {
 public:
     explicit Netizen(const std::string& tid);
-    explicit Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId,std::vector<std::string> fansId, std::vector<std::string> conceredsId);
+    explicit Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId,std::vector<std::string> fansId, std::vector<std::string> conceredsId,std::vector<std::string> commentdId);
 
     virtual ~Netizen(){}
     void getInfo();
@@ -29,6 +30,7 @@ private:
     std::unordered_map<std::string, JottingProxy> _jottings;
     std::unordered_map<std::string, NetizenProxy> _fans;
     std::unordered_map<std::string, NetizenProxy> _concerneds;
+    std::unordered_map<std::string, CommentProxy> _comments;
 };
 
 #endif // NETIZEN_H

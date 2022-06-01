@@ -13,6 +13,7 @@ public:
     std::vector<std::string> findNetizenJotting(std::string netizenId);
     std::vector<std::string> findNetizenFans(std::string netizenId);
     std::vector<std::string> findNetizenConcereds(std::string netizenId);
+    std::vector<std::string> findNetizenComments(std::string netizenId);
 
     Netizen *inCache(std::string objectId);
     void storeObject(const Netizen& netizen);

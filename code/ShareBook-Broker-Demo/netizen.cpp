@@ -2,6 +2,7 @@
 #include "jottingproxy.h"
 #include <unordered_map>
 #include <iostream>
+#include "commentproxy.h"
 
 using json = nlohmann::json;
 
@@ -11,7 +12,7 @@ Netizen::Netizen(const std::string &tid):
 
 }
 
-Netizen::Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId,std::vector<std::string> fansId,std::vector<std::string> concernedsId):
+Netizen::Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId, std::vector<std::string> fansId, std::vector<std::string> concernedsId, std::vector<std::string> commentdId):
     NetizenInterface(id),m_nickName(nickName)
 {
     for(auto &jId:jottingId){
@@ -23,6 +24,9 @@ Netizen::Netizen(const std::string id, std::string nickName, std::vector<std::st
     for(auto &cId:concernedsId){
         _concerneds.insert(std::pair<std::string,NetizenProxy>(cId, NetizenProxy(cId)));
     }
+    for(auto &cId:commentdId){
+        _comments.insert(std::pair<std::string,CommentProxy>(cId, CommentProxy(cId)));
+    }
 }
 
 void Netizen::getInfo()
@@ -33,6 +37,7 @@ void Netizen::getInfo()
         json jotting=jp.second.getAbstract();
         netizenInfo["jottings"][jp.first]["netizen"]=jotting["netizen"];
         netizenInfo["jottings"][jp.first]["content"]=jotting["content"];
+        netizenInfo["jottings"][jp.first]["time"]=jotting["time"];
         netizenInfo["jottings"][jp.first]["material"]=jotting["material_firstPath"];
     }
     for(auto &fp:_fans){

@@ -28,7 +28,7 @@ void RelationalBroker::initDataBase()
         std::unique_ptr<sql::PreparedStatement> stmnt(m_connection->prepareStatement("create table if not exists Netizen(N_id INT(15) unsigned AUTO_INCREMENT,N_nickName varchar(20) not null,primary key(N_id))"));
         stmnt->executeQuery();
 
-        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table if not exists Jotting (J_id INT(15) unsigned NOT NULL ,J_content varchar(2000) not null,N_id INT(15) unsigned not null,primary key(J_id),foreign key(N_id) references Netizen(N_id) on delete cascade on update cascade)"));
+        std::unique_ptr<sql::PreparedStatement> stmnt2(m_connection->prepareStatement("create table if not exists Jotting (J_id INT(15) unsigned NOT NULL ,J_content varchar(2000) not null,J_time DATETIME(6) not null ,N_id INT(15) unsigned not null,primary key(J_id),foreign key(N_id) references Netizen(N_id) on delete cascade on update cascade)"));
         stmnt2->executeQuery();
 
 
@@ -38,6 +38,9 @@ void RelationalBroker::initDataBase()
 
         std::unique_ptr<sql::PreparedStatement> stmnt4(m_connection->prepareStatement("create table if not exists Relation (R_id INT(15) unsigned NOT NULL,N_Fan_id INT(15) unsigned NOT NULL,primary key (R_id,N_Fan_id),foreign key(R_id) references Netizen(N_id) on delete cascade on update cascade,foreign key(N_Fan_id) references Netizen(N_id) on delete cascade on update cascade)"));
         stmnt4->executeQuery();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt5(m_connection->prepareStatement("create table if not exists Comment (C_id INT(15) unsigned NOT NULL,C_content varchar(2000) not null ,N_id INT(15) unsigned not null,J_id INT(15) unsigned not null,primary key(C_id),foreign key(N_id) references Netizen(N_id) on delete cascade on update cascade,foreign key(J_id) references Jotting(J_id) on delete cascade on update cascade)"));
+        stmnt5->executeQuery();
 
         std::unique_ptr<sql::PreparedStatement> stmnt7(m_connection->prepareStatement("insert into Netizen (N_id,N_nickName) values(?,?)"));
         stmnt7->setInt(1,1);
@@ -56,16 +59,18 @@ void RelationalBroker::initDataBase()
         stmnt7->setString(2,"Joey");
         stmnt7->execute();
 
-        std::unique_ptr<sql::PreparedStatement> stmnt8(m_connection->prepareStatement("insert into Jotting (J_id,J_content,N_id) values(?,?,?)"));
+        std::unique_ptr<sql::PreparedStatement> stmnt8(m_connection->prepareStatement("insert into Jotting (J_id,J_content,J_time,N_id) values(?,?,?,?)"));
 
         stmnt8->setInt(1,1);
         stmnt8->setString(2,"wind wind flower");
-        stmnt8->setInt(3,1);
+        stmnt8->setDateTime(3,"2022-05-22 10:00:01");
+        stmnt8->setInt(4,1);
         stmnt8->execute();
 
         stmnt8->setInt(1,2);
         stmnt8->setString(2,"Turn it up now hear me");
-        stmnt8->setInt(3,2);
+        stmnt8->setDateTime(3,"2022-05-22 10:00:02");
+        stmnt8->setInt(4,2);
         stmnt8->execute();
 
         std::unique_ptr<sql::PreparedStatement> stmnt6(m_connection->prepareStatement("insert into Material (M_id,M_path,J_id) values(?,?,?)"));
@@ -80,19 +85,33 @@ void RelationalBroker::initDataBase()
         stmnt6->setInt(3,2);
         stmnt6->execute();
 
-        std::unique_ptr<sql::PreparedStatement> stmnt5(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(?,?)"));
+        std::unique_ptr<sql::PreparedStatement> stmnt9(m_connection->prepareStatement("insert into Relation (R_id,N_Fan_id) values(?,?)"));
 
-        stmnt5->setInt(1,1);
-        stmnt5->setInt(2,3);
-        stmnt5->execute();
+        stmnt9->setInt(1,1);
+        stmnt9->setInt(2,3);
+        stmnt9->execute();
 
-        stmnt5->setInt(1,2);
-        stmnt5->setInt(2,1);
-        stmnt5->execute();
+        stmnt9->setInt(1,2);
+        stmnt9->setInt(2,1);
+        stmnt9->execute();
 
-        stmnt5->setInt(1,4);
-        stmnt5->setInt(2,1);
-        stmnt5->execute();
+        stmnt9->setInt(1,4);
+        stmnt9->setInt(2,1);
+        stmnt9->execute();
+
+        std::unique_ptr<sql::PreparedStatement> stmnt10(m_connection->prepareStatement("insert into Comment (C_id,C_content,N_id,J_id) values(?,?,?,?)"));
+
+        stmnt10->setInt(1,1);
+        stmnt10->setString(2,"Good!!");
+        stmnt10->setInt(3,1);
+        stmnt10->setInt(4,1);
+        stmnt10->execute();
+
+        stmnt10->setInt(1,2);
+        stmnt10->setString(2,"This is a good song!");
+        stmnt10->setInt(3,2);
+        stmnt10->setInt(4,2);
+        stmnt10->execute();
 
     }catch(sql::SQLException& e){
         std::cerr<< e.what() << std::endl;
@@ -102,9 +121,9 @@ void RelationalBroker::initDataBase()
 sql::ResultSet* RelationalBroker::query(std::string command)
 {
     try {
-            // Create a new Statement
+        // Create a new Statement
         std::unique_ptr<sql::Statement> stmnt(m_connection->createStatement());
-            // Execute query
+        // Execute query
         sql::ResultSet *res = stmnt->executeQuery(command);
         return res;
 
