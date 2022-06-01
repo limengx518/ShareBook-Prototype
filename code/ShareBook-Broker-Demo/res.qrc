@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/publish.png</file>
+        <file>images/personal.png</file>
+        <file>images/message.png</file>
+        <file>images/home.png</file>
+        <file>images/cycle.png</file>
+        <file>images/myotherselect.png</file>
+        <file>images/headpic.png</file>
+        <file>images/backbutton.png</file>
+        <file>images/avatar.png</file>
+        <file>images/search.png</file>
+        <file>images/otherchoice.png</file>
+        <file>images/like.png</file>
+        <file>images/liked.png</file>
+        <file>images/collect.png</file>
+        <file>images/collected.png</file>
+        <file>images/transit.png</file>
+        <file>images/commend.png</file>
+    </qresource>
+    <qresource prefix="/qml">
+        <file>qml/PushPage.qml</file>
+        <file>qml/CyclePage.qml</file>
+        <file>qml/PublishPage.qml</file>
+        <file>qml/MessagePage.qml</file>
+        <file>qml/PersonalPage.qml</file>
+        <file>qml/PersonalRelationList.qml</file>
+        <file>qml/JotDetailPage.qml</file>
+    </qresource>
+</RCC>
