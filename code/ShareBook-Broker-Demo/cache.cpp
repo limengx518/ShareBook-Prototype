@@ -7,6 +7,17 @@ Cache::Cache()
 {
     m_redis=new sw::redis::Redis("tcp://127.0.0.1:6379");
     std::cout<<"relate the redis server"<<std::endl;
+
+    auto val = m_redis->command<OptionalString>("CONFIG","SET","maxmemory","3GB");
+    if(val){
+        std::cout<<*val<<std::endl;
+    }
+
+
+    auto policy = m_redis->command<OptionalString>("CONFIG","SET","maxmemory-policy","allkeys-lru");
+    if(policy){
+        std::cout<<*policy<<std::endl;
+    }
 }
 
 
