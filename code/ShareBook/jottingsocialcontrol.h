@@ -11,10 +11,11 @@ class Material;
 class JottingSocialControl
 {
 public:
-    explicit JottingSocialControl(const std::string& netizenId);
+    explicit JottingSocialControl();
     ~JottingSocialControl();
+    void login(std::string id);
 private:
-    Netizen *m_netizen;
+//    Netizen *m_netizen;
 //    PersonalUIControl *m_personalUIControl;
 };
 

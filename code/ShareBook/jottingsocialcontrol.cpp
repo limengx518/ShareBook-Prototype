@@ -12,14 +12,20 @@
 
 using json = nlohmann::json;
 
-JottingSocialControl::JottingSocialControl(const std::string &id)
-{
-    m_netizen=NetizenBroker::getInstance()->findById(id);
+JottingSocialControl::JottingSocialControl(){
+
 //    m_personalUIControl=new PersonalUIControl(m_netizen->getInfo());
 //    m_netizen->getInfo();
 }
 
 JottingSocialControl::~JottingSocialControl()
 {
+}
+
+void JottingSocialControl::login(std::string id)
+{
+   Netizen*  m_netizen=NetizenBroker::getInstance()->findById(id);
+   m_netizen->getInfo();
+
 }
 
