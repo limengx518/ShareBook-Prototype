@@ -14,3 +14,6 @@ sequence_diagram_before中存放的是没有进行版本控制之前的相关截
 1. 观察者模式怎么实现
 2. 界面的Control 和 业务逻辑的 Control 如何区分
 
+## 2022年6月6日
+- 主要更改：基于模型的一致性，统一了属性名和操作名，添加了scanJottings、publishJottings活动图
+
