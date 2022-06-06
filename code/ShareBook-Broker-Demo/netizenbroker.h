@@ -10,10 +10,10 @@ public:
     static NetizenBroker* getInstance();
 
     Netizen *findById(std::string id);
-    std::vector<std::string> findNetizenJotting(std::string netizenId);
-    std::vector<std::string> findNetizenFans(std::string netizenId);
-    std::vector<std::string> findNetizenConcereds(std::string netizenId);
-    std::vector<std::string> findNetizenComments(std::string netizenId);
+    std::vector<std::string> findJottings(std::string netizenId);
+    std::vector<std::string> findFans(std::string netizenId);
+    std::vector<std::string> findConcereds(std::string netizenId);
+    std::vector<std::string> findComments(std::string netizenId);
 
     Netizen *inCache(std::string objectId);
     void storeObject(const Netizen& netizen);

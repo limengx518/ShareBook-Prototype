@@ -38,7 +38,7 @@ Jotting *JottingBroker::findById(std::string id)
     return jotting;
 }
 
-std::vector<std::string> JottingBroker::findMaterial(std::string id)
+std::vector<std::string> JottingBroker::findMaterials(std::string id)
 {
     std::vector<std::string> materialIds;
 std::string com="select M_id from Material where J_id="+id;
@@ -49,7 +49,7 @@ std::string com="select M_id from Material where J_id="+id;
     return materialIds;
 }
 
-std::vector<std::string> JottingBroker::findComment(std::string jottingId)
+std::vector<std::string> JottingBroker::findComments(std::string jottingId)
 {
     std::vector<std::string> commentIds;
 std::string com="select M_id from Material where J_id="+jottingId;

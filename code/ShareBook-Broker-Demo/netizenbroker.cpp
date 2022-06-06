@@ -23,7 +23,7 @@ Netizen *NetizenBroker::findById(std::string id)
             nickName=res->getString(2);
         }
         //retrieveJotting(id)
-        Netizen* netizen=new Netizen(id,nickName,findNetizenJotting(id),findNetizenFans(id),findNetizenConcereds(id),findNetizenComments(id));
+        Netizen* netizen=new Netizen(id,nickName,findJottings(id),findFans(id),findConcereds(id),findComments(id));
 
         storeObject(*netizen);
 
@@ -33,7 +33,7 @@ Netizen *NetizenBroker::findById(std::string id)
 }
 
 
-std::vector<std::string> NetizenBroker::findNetizenJotting(std::string netizenId)
+std::vector<std::string> NetizenBroker::findJottings(std::string netizenId)
 {
     std::string com="select J_id from Jotting where N_id="+netizenId;
     sql::ResultSet* res=RelationalBroker::query(com);
@@ -45,7 +45,7 @@ std::vector<std::string> NetizenBroker::findNetizenJotting(std::string netizenId
 
 }
 
-std::vector<std::string> NetizenBroker::findNetizenFans(std::string netizenId)
+std::vector<std::string> NetizenBroker::findFans(std::string netizenId)
 {
     std::string com="select N_Fan_id from Relation where R_id="+netizenId;
     std::vector<std::string> fansIds;
@@ -56,7 +56,7 @@ std::vector<std::string> NetizenBroker::findNetizenFans(std::string netizenId)
     return fansIds;
 }
 
-std::vector<std::string> NetizenBroker::findNetizenConcereds(std::string netizenId)
+std::vector<std::string> NetizenBroker::findConcereds(std::string netizenId)
 {
     std::string com="select R_id from Relation where N_Fan_id="+netizenId;
     std::vector<std::string> conceredIds;
@@ -69,7 +69,7 @@ std::vector<std::string> NetizenBroker::findNetizenConcereds(std::string netizen
 
 }
 
-std::vector<std::string> NetizenBroker::findNetizenComments(std::string netizenId)
+std::vector<std::string> NetizenBroker::findComments(std::string netizenId)
 {
     std::string com="select C_id from Comment where J_id="+netizenId;
     std::vector<std::string> commentIds;

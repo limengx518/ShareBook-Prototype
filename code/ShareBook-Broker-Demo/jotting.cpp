@@ -7,12 +7,12 @@
 using json = nlohmann::json;
 
 Jotting::Jotting(const std::string &tid, std::string netizenId):
-    JottingInterface(tid),_netizenProxy(netizenId),m_note{}
+    JottingInterface(tid),_netizenProxy(netizenId),m_content{}
 {
 }
 
 Jotting::Jotting(const std::string id, std::string content, std::string time, std::string netizenId, std::vector<std::string> materialsId, std::vector<std::string> commentsId):
-    JottingInterface(id),_netizenProxy(netizenId),m_time{time},m_note{content}
+    JottingInterface(id),_netizenProxy(netizenId),m_time{time},m_content{content}
 {
     for(const auto& item:materialsId){
         _materials.insert(std::pair<std::string,MaterialProxy>(item,MaterialProxy(item)));
@@ -26,7 +26,7 @@ Jotting::Jotting(const std::string id, std::string content, std::string time, st
 nlohmann::json Jotting::getAbstract()
 {
     json j;
-    j["content"]=m_note;
+    j["content"]=m_content;
     j["time"]=m_time;
     j["material_firstPath"]=_materials.begin()->second.getAbstract();
     j["netizen"]=_netizenProxy.getAbstract();
@@ -37,7 +37,7 @@ nlohmann::json Jotting::getAbstract()
 
 const std::string Jotting::note() const
 {
-    return m_note;
+    return m_content;
 }
 
 const std::string Jotting::time() const

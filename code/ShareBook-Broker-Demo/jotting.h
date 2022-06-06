@@ -29,7 +29,7 @@ private:
     std::unordered_map<std::string, MaterialProxy> _materials;
     std::unordered_map<std::string, CommentProxy> _comments;
     std::string m_time;
-    std::string m_note;
+    std::string m_content;
 };
 
 #endif // JOTTING_H
