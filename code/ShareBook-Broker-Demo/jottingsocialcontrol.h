@@ -6,13 +6,16 @@
 #include "jotting.h"
 
 class Material;
+
 class JottingSocialControl
 {
 public:
-    explicit JottingSocialControl(const std::string& netizenId);
+    explicit JottingSocialControl();
     ~JottingSocialControl();
-private:
-    Netizen *m_netizen;
+    void login(std::string netizenId);
+    void pushJottings(std::string lastTime,std::string thisTime);
+    void checkOneJotting(std::string objectId);
+    void addComment(std::string netizenId, std::string jottingId, std::string content);
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

@@ -15,7 +15,7 @@ public:
 
     Jotting *findById(std::string id);
     std::vector<std::string> getSomeJottingsId(std::string lastTime,std::string thisTime);
-    std::vector<std::string> findMaterials(std::string jottingId);
+    std::vector<std::string> findMaterials(std::string jottingid);
     std::vector<std::string> findComments(std::string jottingId);
 
     Jotting* inCache(std::string objectId);

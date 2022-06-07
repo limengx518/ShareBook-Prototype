@@ -60,6 +60,21 @@ void CommentBroker::storeObject(const Comment &comment)
     RelationalBroker::storeObject("comment"+comment.id(),map);
 }
 
+void CommentBroker::addComment(const Comment &comment)
+{
+    std::string id,content,n_id,j_id;
+    id=comment.id();
+    content=comment.content();
+    n_id=comment.publisherId();
+    j_id=comment.jottingId();
+
+    std::string command="insert into Comment (C_id,C_content,N_id,J_id) values('"+id+"','"+content+"','"+n_id+"','"+j_id+"')";
+
+    std::cout<<command<<std::endl;
+    RelationalBroker::add(command);
+    storeObject(comment);
+}
+
 CommentBroker::CommentBroker()
 {
 

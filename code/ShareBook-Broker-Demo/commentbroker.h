@@ -18,7 +18,9 @@ public:
     std::vector<std::string> getSomeCommentsId(std::string lastTime,std::string thisTime);
 
     Comment* inCache(std::string objectId);
-    void storeObject(const Comment& Comment);
+    void storeObject(const Comment& comment);
+
+    void addComment(const Comment& comment);
 
     virtual ~CommentBroker(){};
 private:

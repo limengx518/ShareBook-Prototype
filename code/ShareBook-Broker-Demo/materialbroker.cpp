@@ -16,7 +16,7 @@ Material *MaterialBroker::findById(std::string id)
     Material* material=inCache(id);
     if(material==nullptr){
 
-        std::string command="select * from Material where J_id="+id;
+        std::string command="select * from Material where M_id="+id;
         sql::ResultSet* res=RelationalBroker::query(command);
         std::string id,path,jId;
             // Loop through and print results

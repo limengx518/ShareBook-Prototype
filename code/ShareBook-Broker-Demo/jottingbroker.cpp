@@ -29,7 +29,7 @@ Jotting *JottingBroker::findById(std::string id)
             nid=std::to_string(res->getInt(4));
         }
         //retrieveJotting(id)
-        Jotting *jotting=new Jotting(id,content,time,nid,findMaterial(id),findComment(id));
+        Jotting *jotting=new Jotting(id,content,time,nid,findMaterials(id),findComments(id));
 
         storeObject(*jotting);
         return jotting;
@@ -38,10 +38,24 @@ Jotting *JottingBroker::findById(std::string id)
     return jotting;
 }
 
-std::vector<std::string> JottingBroker::findMaterials(std::string id)
+std::vector<std::string> JottingBroker::getSomeJottingsId(std::string lastTime, std::string thisTime)
+{
+    std::string command="select * from Jotting where J_time BETWEEN '"+lastTime + "' AND '"+thisTime+"'";
+    sql::ResultSet* res=RelationalBroker::query(command);
+    std::string id;
+    std::vector<std::string> ids;
+     // Loop through and print results
+    while (res->next()) {
+        id=std::to_string(res->getInt(1));
+        ids.push_back(id);
+    }
+    return ids;
+}
+
+std::vector<std::string> JottingBroker::findMaterials(std::string jottingId)
 {
     std::vector<std::string> materialIds;
-std::string com="select M_id from Material where J_id="+id;
+std::string com="select M_id from Material where J_id="+jottingId;
     sql::ResultSet* res=RelationalBroker::query(com);
     while (res->next()) {
         materialIds.push_back(std::to_string(res->getInt(1)));
@@ -52,7 +66,7 @@ std::string com="select M_id from Material where J_id="+id;
 std::vector<std::string> JottingBroker::findComments(std::string jottingId)
 {
     std::vector<std::string> commentIds;
-std::string com="select M_id from Material where J_id="+jottingId;
+std::string com="select C_id from Comment where J_id="+jottingId;
     sql::ResultSet* res=RelationalBroker::query(com);
     while (res->next()) {
         commentIds.push_back(std::to_string(res->getInt(1)));

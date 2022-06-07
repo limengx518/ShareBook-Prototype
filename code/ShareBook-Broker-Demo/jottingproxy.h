@@ -12,6 +12,7 @@ public:
     explicit JottingProxy(const std::string &tid);
     virtual ~JottingProxy();
     virtual nlohmann::json getAbstract() override;
+    virtual nlohmann::json getDetail() override;
 
 private:
     Jotting* _jotting;

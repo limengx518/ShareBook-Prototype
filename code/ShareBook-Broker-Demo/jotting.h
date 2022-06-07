@@ -16,7 +16,7 @@ public:
     virtual ~Jotting(){}
 
     virtual nlohmann::json getAbstract() override;
-
+    virtual nlohmann::json getDetail() override;
 
     const std::string note() const;
     const std::string time() const;

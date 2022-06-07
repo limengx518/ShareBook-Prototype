@@ -30,9 +30,23 @@ nlohmann::json Jotting::getAbstract()
     j["time"]=m_time;
     j["material_firstPath"]=_materials.begin()->second.getAbstract();
     j["netizen"]=_netizenProxy.getAbstract();
-//    for(auto& item:_comments)
-//        std::cout<<item.second.getInfo()<<std::endl;
     return j;
+}
+
+nlohmann::json Jotting::getDetail()
+{
+    json j;
+    j["content"]=m_content;
+    j["time"]=m_time;
+    j["netizen"]=_netizenProxy.getAbstract();
+    for(auto& item:_comments){
+        j["comments"][item.first]=item.second.getInfo();
+    }
+    for(auto& item:_materials){
+        j["materials"][item.first]=item.second.getAbstract();
+    }
+    return j;
+
 }
 
 const std::string Jotting::note() const
