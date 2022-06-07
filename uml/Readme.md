@@ -17,3 +17,7 @@ sequence_diagram_before中存放的是没有进行版本控制之前的相关截
 ## 2022年6月6日
 - 主要更改：基于模型的一致性，统一了属性名和操作名，添加了scanJottings、publishJottings活动图
 
+## 2022年6月7日
+- 主要更改：基于模型的一致性，更新完善了类图、顺序图
+- 问题：
+1. 新增评论后，将新增的评论添加到数据库后，需要在Jotting、Netizen中添加，还是在Cache中,没有Jotting的实例 MVC
