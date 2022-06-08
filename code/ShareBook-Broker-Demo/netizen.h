@@ -22,6 +22,7 @@ public:
     const std::vector<std::string> jottings() const;
     const std::vector<std::string> fans() const;
     const std::vector<std::string> concerneds() const;
+    void addComment(std::string commentId);
 
     virtual nlohmann::json getAbstract() override;
 

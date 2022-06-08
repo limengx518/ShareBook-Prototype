@@ -24,6 +24,8 @@ public:
     const std::vector<std::string> materialId() const;
     const std::vector<std::string> commentId() const;
 
+    void addComment(std::string commentId);
+
 private:
     NetizenProxy _netizenProxy;
     std::unordered_map<std::string, MaterialProxy> _materials;

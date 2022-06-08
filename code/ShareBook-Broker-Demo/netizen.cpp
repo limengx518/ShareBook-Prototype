@@ -83,6 +83,11 @@ const std::vector<std::string> Netizen::concerneds() const
     return concerneds;
 }
 
+void Netizen::addComment(std::string commentId)
+{
+    _comments.insert(std::pair<std::string,CommentProxy>(commentId, CommentProxy(commentId)));
+}
+
 nlohmann::json Netizen::getAbstract()
 {
     json j;

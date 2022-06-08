@@ -56,11 +56,12 @@ void JottingSocialControl::addComment(std::string netizenId, std::string jotting
     auto now = std::chrono::system_clock::now();
     auto t_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    ss<<std::put_time(std::localtime(&t_c), "%F %T ");
+    ss<<std::put_time(std::localtime(&t_c), "%F %T");
     std::string time_string=ss.str();
-//    time_string=time_string.replace('-','');
-    std::cout<<time_string<<std::endl;
-    Comment comment("2022020713",content,netizenId,jottingId);
+    time_string.erase(std::find(time_string.begin(), time_string.end(), '-'));
+    time_string.erase(std::find(time_string.begin(), time_string.end(), '-'));
+
+    Comment comment(time_string,content,netizenId,jottingId);
     CommentBroker::getInstance()->addComment(comment);
 }
 

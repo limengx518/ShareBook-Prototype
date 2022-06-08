@@ -72,6 +72,7 @@ void CommentBroker::addComment(const Comment &comment)
 
     std::cout<<command<<std::endl;
     RelationalBroker::add(command);
+    //store in cache
     storeObject(comment);
 }
 
