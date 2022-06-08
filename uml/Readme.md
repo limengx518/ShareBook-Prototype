@@ -21,3 +21,7 @@ sequence_diagram_before中存放的是没有进行版本控制之前的相关截
 - 主要更改：基于模型的一致性，更新完善了类图、顺序图
 - 问题：
 1. 新增评论后，将新增的评论添加到数据库后，需要在Jotting、Netizen中添加，还是在Cache中,没有Jotting的实例 MVC
+
+## 2022年6月8日
+- 主要更改：明确实体类的职责、控制器类应该把业务逻辑的实现委托给实体类
+1. 重新细致描述了用况、修改了login、pushJottings、checkOneJotting、commentJotting顺序图
