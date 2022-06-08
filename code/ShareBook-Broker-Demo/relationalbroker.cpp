@@ -199,6 +199,11 @@ void RelationalBroker::storeObject(std::string key, std::unordered_map<std::stri
     m_cache.storeObject(key,map);
 }
 
+void RelationalBroker::remove(std::string key, std::string field)
+{
+    m_cache.remove(key,field);
+}
+
 
 
 

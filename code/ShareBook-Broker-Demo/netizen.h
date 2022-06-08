@@ -8,6 +8,7 @@
 #include <vector>
 #include "netizeninterface.h"
 #include "netizenproxy.h"
+#include <nlohmann/json.hpp>
 
 class Netizen:public NetizenInterface
 {
@@ -16,15 +17,19 @@ public:
     explicit Netizen(const std::string id, std::string nickName, std::vector<std::string> jottingId,std::vector<std::string> fansId, std::vector<std::string> conceredsId,std::vector<std::string> commentdId);
 
     virtual ~Netizen(){}
-    void getInfo();
+    nlohmann::json getInfo();
 
     const std::string nickName()const;
     const std::vector<std::string> jottings() const;
     const std::vector<std::string> fans() const;
     const std::vector<std::string> concerneds() const;
-    void addComment(std::string commentId);
 
     virtual nlohmann::json getAbstract() override;
+    const std::string readLog();
+    void writeLog();
+    nlohmann::json scanJottings();
+    nlohmann::json checkOneJotting(std::string jottingId);
+    bool comment(const std::string content,const std::string jottingId);
 
 private:
     std::string m_nickName;

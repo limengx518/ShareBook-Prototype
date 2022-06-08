@@ -38,19 +38,22 @@ Jotting *JottingBroker::findById(std::string id)
     return jotting;
 }
 
-std::vector<std::string> JottingBroker::getSomeJottingsId(std::string lastTime, std::string thisTime)
+std::vector<JottingProxy> JottingBroker::pushJottings(std::string netizenId, std::string lastTime, std::string thisTime)
 {
+    std::cout<<"lastTime:"<<lastTime<<std::endl;
+    std::cout<<"thisTime:"<<thisTime<<std::endl;
     std::string command="select * from Jotting where J_time BETWEEN '"+lastTime + "' AND '"+thisTime+"'";
     sql::ResultSet* res=RelationalBroker::query(command);
     std::string id;
-    std::vector<std::string> ids;
+    std::vector<JottingProxy> ids;
      // Loop through and print results
     while (res->next()) {
         id=std::to_string(res->getInt(1));
-        ids.push_back(id);
+        ids.push_back(JottingProxy(id));
     }
     return ids;
 }
+
 
 std::vector<std::string> JottingBroker::findMaterials(std::string jottingId)
 {
@@ -116,6 +119,11 @@ void JottingBroker::storeObject(const Jotting &jotting)
         {"commentId",commentsId}
     };
     RelationalBroker::storeObject("jotting"+jotting.id(),map);
+}
+
+void JottingBroker::remove(std::string jottingId)
+{
+    RelationalBroker::remove("jotting"+jottingId);
 }
 
 JottingBroker::JottingBroker()

@@ -47,4 +47,5 @@ HEADERS += \
     netizenbroker.h \
     netizeninterface.h \
     netizenproxy.h \
-    relationalbroker.h
+    relationalbroker.h \
+    timeInfo.h

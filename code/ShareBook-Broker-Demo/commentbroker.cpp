@@ -76,6 +76,11 @@ void CommentBroker::addComment(const Comment &comment)
     storeObject(comment);
 }
 
+void CommentBroker::remove(std::string commentId)
+{
+    RelationalBroker::remove("comment"+commentId);
+}
+
 CommentBroker::CommentBroker()
 {
 

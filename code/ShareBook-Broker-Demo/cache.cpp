@@ -34,6 +34,15 @@ void Cache::storeObject(std::string key, std::unordered_map<std::string, std::st
     m_redis->hmset(key, object.begin(), object.end());
 }
 
+void Cache::remove(std::string key, std::string field)
+{
+    auto val = m_redis->command<OptionalString>("HDEL",key,field);
+    if(val){
+        std::cout<<*val<<std::endl;
+    }
+}
+
+
 Cache::~Cache()
 {
     delete m_redis;

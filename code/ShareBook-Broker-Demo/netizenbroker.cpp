@@ -145,6 +145,11 @@ void NetizenBroker::storeObject(const Netizen &netizen)
     RelationalBroker::storeObject("netizen"+netizen.id(),map);
 }
 
+void NetizenBroker::remove(const std::string netizenId)
+{
+    RelationalBroker::remove("netizen"+netizenId);
+}
+
 NetizenBroker::NetizenBroker()
 {
 

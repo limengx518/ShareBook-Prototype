@@ -15,6 +15,7 @@ public:
 
     Material* inCache(std::string objectId);
     void storeObject(const Material& material);
+    void remove(std::string materialId);
 
     virtual ~MaterialBroker(){};
 private:

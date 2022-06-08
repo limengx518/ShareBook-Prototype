@@ -23,8 +23,8 @@ public:
     const std::string netizenId() const;
     const std::vector<std::string> materialId() const;
     const std::vector<std::string> commentId() const;
+    void comment(const std::string commentId);
 
-    void addComment(std::string commentId);
 
 private:
     NetizenProxy _netizenProxy;

@@ -22,6 +22,8 @@ public:
 
     void addComment(const Comment& comment);
 
+    void remove(std::string commentId);
+
     virtual ~CommentBroker(){};
 private:
     CommentBroker();

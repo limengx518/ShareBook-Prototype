@@ -17,6 +17,8 @@ public:
 
     Netizen *inCache(std::string objectId);
     void storeObject(const Netizen& netizen);
+    void remove(const std::string netizenId);
+
     virtual ~NetizenBroker(){};
 private:
     NetizenBroker();

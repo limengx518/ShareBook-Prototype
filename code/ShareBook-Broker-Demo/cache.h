@@ -12,6 +12,7 @@ public:
     //数据到底以怎样的方式在redis中存储，hash
     std::unordered_map<std::string,std::string> inCache(std::string  key);
     void storeObject(std::string key,std::unordered_map<std::string,std::string> object);
+    void remove(std::string key,std::string field);
     ~Cache();
 private:
     sw::redis::Redis* m_redis;

@@ -82,7 +82,9 @@ const std::vector<std::string> Jotting::commentId() const
     return vector;
 }
 
-void Jotting::addComment(std::string commentId)
+void Jotting::comment(const std::string commentId)
 {
     _comments.insert(std::pair<std::string,CommentProxy>(commentId, CommentProxy(commentId)));
+     JottingBroker::getInstance()->delete();
 }
+

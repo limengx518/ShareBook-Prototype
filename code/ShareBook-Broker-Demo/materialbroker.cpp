@@ -55,6 +55,11 @@ void MaterialBroker::storeObject(const Material &material)
     RelationalBroker::storeObject("material"+material.id(),map);
 }
 
+void MaterialBroker::remove(std::string materialId)
+{
+    RelationalBroker::remove("material"+materialId);
+}
+
 
 MaterialBroker::MaterialBroker()
 {

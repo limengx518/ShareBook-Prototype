@@ -14,10 +14,12 @@ int main()
 //        broker->initDataBase();
 
     JottingSocialControl control;
-//    control.login("1");
+    cout<<control.login("1").dump(4)<<endl;
+    cout<<control.pushJottings("1").dump(4)<<endl;
+    cout<<control.checkOneJotting("1","2").dump(4)<<endl;
 //    control.pushJottings("2022-4-22 10:00:01","2022-7-22 10:00:03");
 //    control.checkOneJotting("3");
-    control.addComment("1","1","hahahah");
+//    control.addComment("1","1","hahahah");
 
     return 0;
 }
