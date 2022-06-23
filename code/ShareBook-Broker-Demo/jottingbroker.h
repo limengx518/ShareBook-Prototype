@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <jottinginterface.h>
 #include <jotting.h>
-#include <relationalbroker.h>
+#include "relationalbroker.h"
 #include <vector>
-#include "cache.h"
+#include "jottingproxy.h"
 
 class JottingBroker : public RelationalBroker
 {
@@ -18,14 +18,20 @@ public:
     std::vector<std::string> findMaterials(std::string jottingid);
     std::vector<std::string> findComments(std::string jottingId);
 
-    Jotting* inCache(std::string objectId);
-    void storeObject(const Jotting& jotting);
-    void remove(std::string jottingId);
+    Jotting* inCache(std::string id);
+
+    void update() override;
 
     virtual ~JottingBroker(){};
 private:
     JottingBroker();
     static JottingBroker* m_jottingBroker;
+
+    std::unordered_map<std::string,std::pair<Jotting,int>> newClean;
+//    std::unordered_map<std::string,std::pair<Jotting,int>> newDirty;
+
+    std::unordered_map<std::string,std::pair<Jotting,int>> oldClean;
+//    std::unordered_map<std::string,std::pair<Jotting,int>> oldDirty;
 };
 
 #endif // JOTTINGBROKER_H

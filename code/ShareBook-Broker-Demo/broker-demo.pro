@@ -7,7 +7,6 @@ LIBS+=-lmariadbcpp -lredis++ -lhiredis -pthread
 
 
 SOURCES += \
-        cache.cpp \
         comment.cpp \
         commentbroker.cpp \
         commentinterface.cpp \
@@ -29,7 +28,6 @@ SOURCES += \
         relationalbroker.cpp
 
 HEADERS += \
-    cache.h \
     comment.h \
     commentbroker.h \
     commentinterface.h \

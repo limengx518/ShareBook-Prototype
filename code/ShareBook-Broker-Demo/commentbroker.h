@@ -6,7 +6,6 @@
 
 #include "commentinterface.h"
 #include "relationalbroker.h"
-#include "cache.h"
 #include "comment.h"
 
 class CommentBroker : public RelationalBroker

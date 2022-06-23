@@ -31,7 +31,9 @@ Jotting *JottingBroker::findById(std::string id)
         //retrieveJotting(id)
         Jotting *jotting=new Jotting(id,content,time,nid,findMaterials(id),findComments(id));
 
-        storeObject(*jotting);
+        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+        oldClean.insert({jotting->id(),std::make_pair(*jotting,0)});
+
         return jotting;
     }
     std::cout<<"in cache"<<std::endl;
@@ -77,53 +79,38 @@ std::string com="select C_id from Comment where J_id="+jottingId;
     return commentIds;
 }
 
-Jotting* JottingBroker::inCache(std::string objectId)
+Jotting* JottingBroker::inCache(std::string id)
 {
-    std::unordered_map<std::string,std::string> m=RelationalBroker::inCache("jotting"+objectId);
-    if(m.empty())
-        return nullptr;
-    std::stringstream materialsId(m["materialId"]);
-    std::stringstream commentsId(m["commentId"]);
-    std::string id;
-    std::vector<std::string> materials,comments;
-    while(std::getline(materialsId,id,',')){
-        materials.push_back(id);
+    if(oldClean.find(id)!=oldClean.end()){
+        //返回jotting的引用
+        return &oldClean.find(id)->second.first;
     }
-    while(std::getline(commentsId,id,',')){
-        comments.push_back(id);
-    }
-    Jotting* jotting=new Jotting(objectId,m["note"],m["time"],m["netizenId"],materials,comments);
 
-    return jotting;
+//    if(oldDirty.find(id)!=oldDirty.end()){
+//        //返回jotting的引用
+//        return &oldDirty.find(id)->second.first;
+//    }
+
+    if(newClean.find(id)!=newClean.end()){
+        //返回jotting的引用
+        return &newClean.find(id)->second.first;
+    }
+
+//    if(newDirty.find(id)!=newDirty.end()){
+//        //返回jotting的引用
+//        return &newDirty.find(id)->second.first;
+//    }
+
+    return nullptr;
 }
 
-void JottingBroker::storeObject(const Jotting &jotting)
+void JottingBroker::update()
 {
-    std::vector<std::string> vector=jotting.materialId();
-    std::vector<std::string> comment=jotting.commentId();
-    std::string materialsId="";
-    std::string commentsId="";
-    for(const auto &item:vector){
-        materialsId+=item;
-        materialsId+=",";
-    }
-    for(const auto &item:comment){
-        commentsId+=item;
-        commentsId+=",";
-    }
-    std::unordered_map<std::string,std::string> map{
-        {"note", jotting.note()},
-        {"time", jotting.time()},
-        {"netizenId", jotting.netizenId()},
-        {"materialId",materialsId},
-        {"commentId",commentsId}
-    };
-    RelationalBroker::storeObject("jotting"+jotting.id(),map);
-}
+    //判断是否需要更新
 
-void JottingBroker::remove(std::string jottingId)
-{
-    RelationalBroker::remove("jotting"+jottingId);
+    for(auto &cache:newClean){
+        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+cache.second.first.id()+",""?,?,?)";
+    }
 }
 
 JottingBroker::JottingBroker()

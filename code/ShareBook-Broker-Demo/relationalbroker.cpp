@@ -178,7 +178,7 @@ sql::ResultSet* RelationalBroker::query(std::string command)
     return nullptr;
 }
 
-void RelationalBroker::add(std::string command)
+void RelationalBroker::insert(std::string command)
 {
     try {
         std::unique_ptr<sql::PreparedStatement> stmnt(m_connection->prepareStatement(command));
@@ -187,21 +187,6 @@ void RelationalBroker::add(std::string command)
     catch(sql::SQLException& e){
       std::cerr << "Error inserting new task: " << e.what() << std::endl;
    }
-}
-
-std::unordered_map<std::string, std::string> RelationalBroker::inCache(std::string objectId)
-{
-    return m_cache.inCache(objectId);
-}
-
-void RelationalBroker::storeObject(std::string key, std::unordered_map<std::string, std::string> map)
-{
-    m_cache.storeObject(key,map);
-}
-
-void RelationalBroker::remove(std::string key, std::string field)
-{
-    m_cache.remove(key,field);
 }
 
 
