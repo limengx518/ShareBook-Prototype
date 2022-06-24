@@ -28,7 +28,7 @@ nlohmann::json JottingSocialControl::login(std::string netizenId)
 {
     Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
 //    netizen->writeLog();
-    netizen->readLog();
+//    netizen->readLog();
     return netizen->getInfo();
 }
 

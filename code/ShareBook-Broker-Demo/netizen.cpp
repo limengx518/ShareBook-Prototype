@@ -160,7 +160,7 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
     Jotting *jotting=JottingBroker::getInstance()->findById(jottingId);
     jotting->comment(comment.id());
 
-    NetizenBroker::getInstance()->remove(id());
+//    NetizenBroker::getInstance()->remove(id());
 
     return true;
 }

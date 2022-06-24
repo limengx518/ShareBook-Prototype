@@ -1,4 +1,5 @@
 #include "jotting.h"
+#include "jottingbroker.h"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <functional>
@@ -85,6 +86,6 @@ const std::vector<std::string> Jotting::commentId() const
 void Jotting::comment(const std::string commentId)
 {
     _comments.insert(std::pair<std::string,CommentProxy>(commentId, CommentProxy(commentId)));
-     JottingBroker::getInstance()->delete();
+//     JottingBroker::getInstance()->delete();
 }
 

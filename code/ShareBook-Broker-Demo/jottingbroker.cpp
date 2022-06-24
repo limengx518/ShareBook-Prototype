@@ -30,9 +30,11 @@ Jotting *JottingBroker::findById(std::string id)
         }
         //retrieveJotting(id)
         Jotting *jotting=new Jotting(id,content,time,nid,findMaterials(id),findComments(id));
-
+        //更新缓存
+        update();
         //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-        oldClean.insert({jotting->id(),std::make_pair(*jotting,0)});
+        m_oldClean.insert({jotting->id(),*jotting});
+        m_newCleanId.insert(jotting->id());
 
         return jotting;
     }
@@ -81,35 +83,55 @@ std::string com="select C_id from Comment where J_id="+jottingId;
 
 Jotting* JottingBroker::inCache(std::string id)
 {
-    if(oldClean.find(id)!=oldClean.end()){
+    if(m_oldClean.find(id)!=m_oldClean.end()){
         //返回jotting的引用
-        return &oldClean.find(id)->second.first;
+        return &m_oldClean.find(id)->second;
     }
 
-//    if(oldDirty.find(id)!=oldDirty.end()){
-//        //返回jotting的引用
-//        return &oldDirty.find(id)->second.first;
-//    }
-
-    if(newClean.find(id)!=newClean.end()){
+    if(m_newClean.find(id)!=m_newClean.end()){
         //返回jotting的引用
-        return &newClean.find(id)->second.first;
+        return &m_newClean.find(id)->second;
     }
-
-//    if(newDirty.find(id)!=newDirty.end()){
-//        //返回jotting的引用
-//        return &newDirty.find(id)->second.first;
-//    }
 
     return nullptr;
 }
 
 void JottingBroker::update()
 {
-    //判断是否需要更新
+    //判断缓存大小是否达到最大值，若为最大则删除部分jotting对象
+    if(m_newClean.size()==MAX_CAPACITY){
+        std::cout<<"删除相关内容\n";
+        for(int i=0;i<DELETE_COUNT;i++){
+            //获取要删除的jottingId
+            auto jotting_id=m_newCleanId.begin();
 
-    for(auto &cache:newClean){
-        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+cache.second.first.id()+",""?,?,?)";
+            //将newClean里的jotting存入数据库
+            auto jotting=m_newClean.at(*jotting_id);
+            std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.id()+","+jotting.note()+","+jotting.time()+","+jotting.netizenId()+")";
+            RelationalBroker::insert(command);
+
+            //将指定jotting以及jottingid进行删除
+            m_newClean.erase(*jotting_id);
+            m_newCleanId.erase(jotting_id);
+        }
+    }
+
+    if(m_oldClean.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto jotting_id=m_oldCleanId.begin();
+            m_oldClean.erase(*jotting_id);
+            m_oldCleanId.erase(jotting_id);
+        }
+    }
+
+}
+
+JottingBroker::~JottingBroker()
+{
+    //程序退出后，将缓存中的新数据存入数据库
+    for(auto &jotting:m_newClean){
+        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
+        RelationalBroker::insert(command);
     }
 }
 

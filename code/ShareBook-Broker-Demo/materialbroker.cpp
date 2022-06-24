@@ -28,38 +28,68 @@ Material *MaterialBroker::findById(std::string id)
         //retrieveJotting(id)
         Material* material=new Material(id,jId,path);
 
-        storeObject(*material);
+        //更新缓存
+        update();
+        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+        m_oldClean.insert({material->id(),*material});
+        m_newCleanId.insert(material->id());
 
         return material;
     }
     return material;
 }
 
-Material *MaterialBroker::inCache(std::string objectId)
+Material *MaterialBroker::inCache(std::string id)
 {
-    std::unordered_map<std::string,std::string> map=RelationalBroker::inCache("material"+objectId);
-    if(map.empty()){
-        return nullptr;
+    if(m_oldClean.find(id)!=m_oldClean.end()){
+        //返回material的引用
+        return &m_oldClean.find(id)->second;
     }
-    Material* material=new Material(objectId,map["jottingId"],map["path"]);
-    return material;
+
+    if(m_newClean.find(id)!=m_newClean.end()){
+        //返回material的引用
+        return &m_newClean.find(id)->second;
+    }
+
+    return nullptr;
 }
 
-void MaterialBroker::storeObject(const Material &material)
+void MaterialBroker::update()
 {
-    std::unordered_map<std::string,std::string> map{
-        {"id",material.id()},
-        {"path",material.path()},
-        {"jottingId",material.jottingId()}
-    };
-    RelationalBroker::storeObject("material"+material.id(),map);
+    //判断缓存大小是否达到最大值，若为最大则删除部分material对象
+    if(m_newClean.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            //获取要删除的materialId
+            auto material_id=m_newCleanId.begin();
+
+            //将newClean里的material存入数据库
+            auto material=m_newClean.at(*material_id);
+            std::string command="insert into Material (M_id,M_path,J_id) values("+material.id()+","+material.path()+","+material.jottingId()+")";
+            RelationalBroker::insert(command);
+
+            //将指定material以及material进行删除
+            m_newClean.erase(*material_id);
+            m_newCleanId.erase(material_id);
+        }
+    }
+
+    if(m_oldClean.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto material_id=m_oldCleanId.begin();
+            m_oldClean.erase(*material_id);
+            m_oldCleanId.erase(material_id);
+        }
+    }
 }
 
-void MaterialBroker::remove(std::string materialId)
+MaterialBroker::~MaterialBroker()
 {
-    RelationalBroker::remove("material"+materialId);
+    //程序退出后，将缓存中的新数据存入数据库
+    for(auto &material:m_newClean){
+        std::string command="insert into Material (M_id,M_path,J_id) values("+material.second.id()+","+material.second.path()+","+material.second.jottingId()+")";
+        RelationalBroker::insert(command);
+    }
 }
-
 
 MaterialBroker::MaterialBroker()
 {

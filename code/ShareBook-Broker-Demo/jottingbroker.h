@@ -2,11 +2,15 @@
 #define JOTTINGBROKER_H
 
 #include <unordered_map>
+#include <set>
 #include <jottinginterface.h>
 #include <jotting.h>
 #include "relationalbroker.h"
 #include <vector>
 #include "jottingproxy.h"
+
+#define MAX_CAPACITY 30
+#define DELETE_COUNT 15
 
 class JottingBroker : public RelationalBroker
 {
@@ -22,16 +26,16 @@ public:
 
     void update() override;
 
-    virtual ~JottingBroker(){};
+    virtual ~JottingBroker();
 private:
     JottingBroker();
     static JottingBroker* m_jottingBroker;
 
-    std::unordered_map<std::string,std::pair<Jotting,int>> newClean;
-//    std::unordered_map<std::string,std::pair<Jotting,int>> newDirty;
+    std::unordered_map<std::string,Jotting> m_newClean;
+    std::set<std::string> m_newCleanId;
 
-    std::unordered_map<std::string,std::pair<Jotting,int>> oldClean;
-//    std::unordered_map<std::string,std::pair<Jotting,int>> oldDirty;
+    std::unordered_map<std::string,Jotting> m_oldClean;
+    std::set<std::string> m_oldCleanId;
 };
 
 #endif // JOTTINGBROKER_H
