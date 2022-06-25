@@ -105,17 +105,23 @@ const std::string Netizen::readLog()
     std::string line,last_line;
     int lineNumber=0,i=0;
     std::ifstream logFile;
+    //打开log.txt文件
     logFile.open("/temp/log.txt");
 
+    //得到所有的行数
     while(std::getline(logFile,line))
         lineNumber++;
 
+    //修改状态标志
     logFile.clear();
+    //设置输入位置指示器
     logFile.seekg(0);
 
+    //得到倒数第二行中的内容
     while(std::getline(logFile,last_line) && i<lineNumber-2)
         i++;
 
+    //关闭文件
     logFile.close();
 //    std::cout<<"line="<<last_line<<std::endl;
     last_line = last_line.substr(4,last_line.length()-1);
@@ -126,8 +132,10 @@ void Netizen::writeLog()
 {
     std::string time_string=getTime();
     std::ofstream logFile;
-    logFile.open("/temp/log.txt",std::ios::out|std::ios::app);
+    //打开log.txt文件，记录本次登陆时间
+    logFile.open("/temp/log.txt",std::ios::app|std::ios::out);
     logFile<<"in:"<<time_string<<std::endl;
+    logFile.close();
 }
 
 nlohmann::json Netizen::scanJottings()
@@ -148,15 +156,22 @@ nlohmann::json Netizen::checkOneJotting(std::string jottingId)
 
 bool Netizen::comment(const std::string content, const std::string jottingId)
 {
-
+    //获取创建时间
     std::string time=getTime();
     time.erase(std::find(time.begin(), time.end(), '-'));
     time.erase(std::find(time.begin(), time.end(), '-'));
+
+    //创建笔记对象
     Comment comment(time,content,id(),jottingId);
 
+    //将笔记对象存入newCleanCache缓存
     CommentBroker::getInstance()->addComment(comment);
-    _comments.insert(std::pair<std::string,CommentProxy>(comment.id(), CommentProxy(comment.id())));
 
+    //建立netizen和comment的联系，并将netizen将其改为DirtyCache里
+    _comments.insert(std::pair<std::string,CommentProxy>(comment.id(), CommentProxy(comment.id())));
+    NetizenBroker::getInstance()->addChangeCache(id());
+
+    //建立jotting和comment的联系，并将jotting将其改为DirtyCache里
     Jotting *jotting=JottingBroker::getInstance()->findById(jottingId);
     jotting->comment(comment.id());
 

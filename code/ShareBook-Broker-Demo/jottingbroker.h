@@ -9,8 +9,8 @@
 #include <vector>
 #include "jottingproxy.h"
 
-#define MAX_CAPACITY 30
-#define DELETE_COUNT 15
+#define MAX_CAPACITY 4
+#define DELETE_COUNT 2
 
 class JottingBroker : public RelationalBroker
 {
@@ -24,7 +24,9 @@ public:
 
     Jotting* inCache(std::string id);
 
-    void update() override;
+    void update() override;    //清除部分缓存
+
+    void addChangeCache(std::string id);   //更新的操作时改变缓存
 
     virtual ~JottingBroker();
 private:
@@ -36,6 +38,13 @@ private:
 
     std::unordered_map<std::string,Jotting> m_oldClean;
     std::set<std::string> m_oldCleanId;
+
+    std::unordered_map<std::string,Jotting> m_newDirty;
+    std::set<std::string> m_newDirtyId;
+
+    std::unordered_map<std::string,Jotting> m_oldDirty;
+    std::set<std::string> m_oldDirtyId;
+
 };
 
 #endif // JOTTINGBROKER_H

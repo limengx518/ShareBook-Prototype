@@ -46,20 +46,20 @@ Comment *CommentBroker::findById(std::string id)
 
 void CommentBroker::addComment(const Comment &comment)
 {
-    std::string id,content,n_id,j_id;
-    id=comment.id();
-    content=comment.content();
-    n_id=comment.publisherId();
-    j_id=comment.jottingId();
+//    std::string id,content,n_id,j_id;
+//    id=comment.id();
+//    content=comment.content();
+//    n_id=comment.publisherId();
+//    j_id=comment.jottingId();
 
-    std::string command="insert into Comment (C_id,C_content,N_id,J_id) values('"+id+"','"+content+"','"+n_id+"','"+j_id+"')";
+//    std::string command="insert into Comment (C_id,C_content,N_id,J_id) values('"+id+"','"+content+"','"+n_id+"','"+j_id+"')";
 
-//    //更新缓存
-//    update();
-//    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-//    m_oldClean.insert({jotting->id(),*jotting});
+    //更新缓存
+    update();
+    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+    m_newClean.insert({comment.id(),comment});
 
-    std::cout<<command<<std::endl;
+//    std::cout<<command<<std::endl;
 
 }
 

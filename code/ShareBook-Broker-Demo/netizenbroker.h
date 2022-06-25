@@ -23,6 +23,8 @@ public:
 
     void update() override;
 
+    void addChangeCache(std::string id);   //更新的操作时改变缓存
+
     virtual ~NetizenBroker();
 private:
     NetizenBroker();
@@ -34,6 +36,12 @@ private:
 
     std::unordered_map<std::string,Netizen> m_oldClean;
     std::set<std::string> m_oldCleanId;
+
+    std::unordered_map<std::string,Netizen> m_newDirty;
+    std::set<std::string> m_newDirtyId;
+
+    std::unordered_map<std::string,Netizen> m_oldDirty;
+    std::set<std::string> m_oldDirtyId;
 };
 
 #endif // NETIZENBROKER_H

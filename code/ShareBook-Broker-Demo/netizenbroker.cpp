@@ -96,6 +96,16 @@ Netizen *NetizenBroker::inCache(std::string id)
         return &m_newClean.find(id)->second;
     }
 
+    if(m_oldDirty.find(id)!=m_oldDirty.end()){
+        //返回netizen的引用
+        return &m_oldDirty.find(id)->second;
+    }
+
+    if(m_newDirty.find(id)!=m_newDirty.end()){
+        //返回netizen的引用
+        return &m_newDirty.find(id)->second;
+    }
+
     return nullptr;
 }
 
@@ -124,6 +134,51 @@ void NetizenBroker::update()
             m_oldClean.erase(*netizen_id);
             m_oldCleanId.erase(netizen_id);
         }
+    }
+
+    if(m_newDirty.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto netizen_id=m_newDirtyId.begin();
+
+            //将newDirty里被修改的jotting存入数据库
+            auto netizen=m_newDirty.at(*netizen_id);
+            std::string command="insert into Netizen (N_id,N_nickName) values("+netizen.id()+","+netizen.nickName()+")";
+            RelationalBroker::insert(command);
+
+            m_newDirty.erase(*netizen_id);
+            m_newDirtyId.erase(netizen_id);
+        }
+    }
+
+    if(m_oldDirty.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto netizen_id=m_oldDirtyId.begin();
+
+            //将oldDirty里被修改的jotting存入数据库
+            auto netizen=m_oldDirty.at(*netizen_id);
+            std::string command="insert into Netizen (N_id,N_nickName) values("+netizen.id()+","+netizen.nickName()+")";
+            RelationalBroker::insert(command);
+
+            m_oldDirty.erase(*netizen_id);
+            m_oldDirtyId.erase(netizen_id);
+        }
+    }
+}
+
+void NetizenBroker::addChangeCache(std::string id)
+{
+    auto netizen=m_newClean.find(id);
+    if(netizen!=m_newClean.end()){
+        m_newDirty.insert(*netizen);
+        m_newDirtyId.insert(netizen->first);
+        m_newClean.erase(netizen);
+        m_newCleanId.erase(netizen->first);
+    }else{
+        netizen=m_oldClean.find(id);
+        m_oldDirty.insert(*netizen);
+        m_oldDirtyId.insert(netizen->first);
+        m_oldClean.erase(netizen);
+        m_oldCleanId.erase(netizen->first);
     }
 }
 

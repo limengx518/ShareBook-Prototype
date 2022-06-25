@@ -34,7 +34,10 @@ Jotting *JottingBroker::findById(std::string id)
         update();
         //将从数据库中拿出的数据放在缓存中(旧的净缓存)
         m_oldClean.insert({jotting->id(),*jotting});
-        m_newCleanId.insert(jotting->id());
+        m_oldCleanId.insert(jotting->id());
+
+        std::cout<<"jotting_oldClean:"<<m_oldClean.size()<<"\n";
+        std::cout<<"jotting_oldCleanId:"<<m_oldCleanId.size()<<"\n";
 
         return jotting;
     }
@@ -46,6 +49,7 @@ std::vector<JottingProxy> JottingBroker::pushJottings(std::string netizenId, std
 {
     std::cout<<"lastTime:"<<lastTime<<std::endl;
     std::cout<<"thisTime:"<<thisTime<<std::endl;
+    thisTime="2022-09-25 21:27:59";
     std::string command="select * from Jotting where J_time BETWEEN '"+lastTime + "' AND '"+thisTime+"'";
     sql::ResultSet* res=RelationalBroker::query(command);
     std::string id;
@@ -93,6 +97,16 @@ Jotting* JottingBroker::inCache(std::string id)
         return &m_newClean.find(id)->second;
     }
 
+    if(m_oldDirty.find(id)!=m_oldDirty.end()){
+        //返回jotting的引用
+        return &m_oldDirty.find(id)->second;
+    }
+
+    if(m_newDirty.find(id)!=m_newDirty.end()){
+        //返回jotting的引用
+        return &m_newDirty.find(id)->second;
+    }
+
     return nullptr;
 }
 
@@ -124,6 +138,50 @@ void JottingBroker::update()
         }
     }
 
+    if(m_newDirty.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto jotting_id=m_newDirtyId.begin();
+
+            //将newDirty里被修改的jotting存入数据库
+            auto jotting=m_newDirty.at(*jotting_id);
+            std::string command="update Jotting (J_id,J_content,J_time,N_id) values("+jotting.id()+","+jotting.note()+","+jotting.time()+","+jotting.netizenId()+")";
+            RelationalBroker::insert(command);
+
+            m_newDirty.erase(*jotting_id);
+            m_newDirtyId.erase(jotting_id);
+        }
+    }
+
+    if(m_oldDirty.size()==MAX_CAPACITY){
+        for(int i=0;i<DELETE_COUNT;i++){
+            auto jotting_id=m_oldDirtyId.begin();
+
+            //将oldDirty里被修改的jotting存入数据库
+            auto jotting=m_oldDirty.at(*jotting_id);
+            std::string command="update Jotting (J_id,J_content,J_time,N_id) values("+jotting.id()+","+jotting.note()+","+jotting.time()+","+jotting.netizenId()+")";
+            RelationalBroker::insert(command);
+
+            m_oldDirty.erase(*jotting_id);
+            m_oldDirtyId.erase(jotting_id);
+        }
+    }
+}
+
+void JottingBroker::addChangeCache(std::string id)
+{
+    auto jotting=m_newClean.find(id);
+    if(jotting!=m_newClean.end()){
+        m_newDirty.insert(*jotting);
+        m_newDirtyId.insert(jotting->first);
+        m_newClean.erase(jotting);
+        m_newCleanId.erase(jotting->first);
+    }else{
+        jotting=m_oldClean.find(id);
+        m_oldDirty.insert(*jotting);
+        m_oldDirtyId.insert(jotting->first);
+        m_oldClean.erase(jotting);
+        m_oldCleanId.erase(jotting->first);
+    }
 }
 
 JottingBroker::~JottingBroker()
