@@ -21,10 +21,10 @@ public:
     const std::string note() const;
     const std::string time() const;
     const std::string netizenId() const;
+    const std::vector<std::string> commentId() ;
     const std::vector<std::string> materialId() const;
     const std::vector<std::string> commentId() const;
     void comment(const std::string commentId);
-
 
 private:
     NetizenProxy _netizenProxy;

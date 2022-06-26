@@ -23,9 +23,11 @@ public:
     void addComment(const Comment& comment);
 
     Comment* inCache(std::string id);
+    Comment* inCache(std::unordered_map<std::string,Comment>& cache,std::set<std::string>& cacheId,std::string id);
 
     void update() override;
 
+    void commentIsExistInNew(std::string id);
     virtual ~CommentBroker();
 private:
     CommentBroker();
@@ -36,6 +38,8 @@ private:
 
     std::unordered_map<std::string,Comment> m_oldClean;
     std::set<std::string> m_oldCleanId;
+
+
 };
 
 #endif // COMMENTBROKER_H

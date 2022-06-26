@@ -30,16 +30,15 @@ Comment *CommentBroker::findById(std::string id)
             jid=res->getString(4);
         }
         //retrieveComment(id)
-        Comment *comment=new Comment(id,content,nid,jid);
+        comment=new Comment(id,content,nid,jid);
 
         //更新缓存
         update();
         //将从数据库中拿出的数据放在缓存中(旧的净缓存)
         m_oldClean.insert({comment->id(),*comment});
-        m_newCleanId.insert(comment->id());
-
-        return comment;
+        m_oldCleanId.insert(comment->id());
     }
+
     std::cout<<"in cache"<<std::endl;
     return comment;
 }
@@ -65,16 +64,29 @@ void CommentBroker::addComment(const Comment &comment)
 
 Comment *CommentBroker::inCache(std::string id)
 {
-    if(m_oldClean.find(id)!=m_oldClean.end()){
-        //返回comment的引用
-        return &m_oldClean.find(id)->second;
+    auto comment=inCache(m_oldClean,m_oldCleanId,id);
+    if(comment){
+        return comment;
     }
 
-    if(m_newClean.find(id)!=m_newClean.end()){
-        //返回comment的引用
-        return &m_newClean.find(id)->second;
+    comment=inCache(m_newClean,m_newCleanId,id);
+    if(comment){
+        return comment;
     }
+    return comment;
+}
 
+Comment *CommentBroker::inCache(std::unordered_map<std::string, Comment> &cache, std::set<std::string> &cacheId, std::string id)
+{
+    //根据id判断是否在缓存中
+    if(cache.find(id)!=cache.end()){
+        //访问量增加，将其Id向“Id队列”的后方移动
+        //先删除再插入
+        cacheId.erase(id);
+        cacheId.insert(id);
+        //返回netizen的引用
+        return &cache.find(id)->second;
+    }
     return nullptr;
 }
 
@@ -104,6 +116,25 @@ void CommentBroker::update()
             m_oldCleanId.erase(comment_id);
         }
     }
+}
+
+void CommentBroker::commentIsExistInNew(std::string id)
+{
+    auto iterator=m_newCleanId.find(id);
+    if(iterator!=m_newCleanId.end()){
+        m_newClean.erase(id);
+        m_newCleanId.erase(iterator);
+        return;
+    }
+
+//    iterator=m_newDirtyId.find(id);
+//    if(iterator!=m_newDirtyId.end()){
+//        m_newDirty.erase(id);
+//        m_newDirtyId.erase(iterator);
+//    }
+
+    return;
+
 }
 
 CommentBroker::~CommentBroker()

@@ -20,10 +20,12 @@ public:
     std::vector<std::string> findComments(std::string netizenId);
 
     Netizen *inCache(std::string id);
+    Netizen *inCache(std::unordered_map<std::string,Netizen>& cache,std::set<std::string>& cacheId,std::string id);
 
     void update() override;
+    void updateCache(std::unordered_map<std::string,Netizen>& cache,std::set<std::string>& cacheId,bool isDirty);
 
-    void addChangeCache(std::string id);   //更新的操作时改变缓存
+    void cleanToDirtyState(std::string id);   //更新的操作时改变缓存
 
     virtual ~NetizenBroker();
 private:

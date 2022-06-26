@@ -17,6 +17,7 @@ public:
     Material *findById(std::string id);
 
     Material* inCache(std::string id);
+    Material* inCache(std::unordered_map<std::string, Material> &cache, std::set<std::string>& cacheId, std::string id);
 
     void update() override;
 

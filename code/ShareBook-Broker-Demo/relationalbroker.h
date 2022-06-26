@@ -18,7 +18,7 @@ public:
     void insert(std::string command);
 
     virtual void update()=0;
-
+    //清除某些缓存
     virtual ~RelationalBroker(){}
 private:
     std::unique_ptr<sql::Connection> m_connection;

@@ -162,20 +162,36 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
     time.erase(std::find(time.begin(), time.end(), '-'));
 
     //创建笔记对象
-    Comment comment(time,content,id(),jottingId);
+    Comment *comment=new Comment(time,content,id(),jottingId);
 
     //将笔记对象存入newCleanCache缓存
-    CommentBroker::getInstance()->addComment(comment);
+    CommentBroker::getInstance()->addComment(*comment);
 
     //建立netizen和comment的联系，并将netizen将其改为DirtyCache里
-    _comments.insert(std::pair<std::string,CommentProxy>(comment.id(), CommentProxy(comment.id())));
-    NetizenBroker::getInstance()->addChangeCache(id());
+    _comments.insert(std::pair<std::string,CommentProxy>(comment->id(), CommentProxy(comment->id())));
+    NetizenBroker::getInstance()->cleanToDirtyState(id());
 
     //建立jotting和comment的联系，并将jotting将其改为DirtyCache里
     Jotting *jotting=JottingBroker::getInstance()->findById(jottingId);
-    jotting->comment(comment.id());
+    jotting->comment(comment->id());
 
 //    NetizenBroker::getInstance()->remove(id());
+
+    return true;
+}
+
+bool Netizen::publishJotting(std::string content, std::string time)
+{
+    std::vector<std::string> vec;
+    //创建笔记对象
+    Jotting* jotting=new Jotting(time,content,time,id(),vec,vec);
+
+     //将笔记对象存入newCleanCache缓存
+    JottingBroker::getInstance()->addJotting(*jotting);
+
+    //建立netizen和comment的联系，并将netizen放到DirtyCache
+    _jottings.insert(std::pair<std::string,JottingProxy>(jotting->id(),JottingProxy(jotting->id())));
+    NetizenBroker::getInstance()->cleanToDirtyState(id());
 
     return true;
 }

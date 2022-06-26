@@ -23,10 +23,18 @@ public:
     std::vector<std::string> findComments(std::string jottingId);
 
     Jotting* inCache(std::string id);
+    Jotting* inCache(std::unordered_map<std::string, Jotting> &cache, std::set<std::string>& cacheId, std::string id);
 
     void update() override;    //清除部分缓存
+    //清除缓存具体操作
+    void updateCache(std::unordered_map<std::string,Jotting>& cache,std::set<std::string>& cacheId,bool isDirty);
 
-    void addChangeCache(std::string id);   //更新的操作时改变缓存
+    void cleanToDirtyState(std::string id);   //更新的操作时改变缓存
+
+    //判断jotting是否在newCleancache或者newDrtyCache中，将其放入数据库
+    void  jottingIsExistInNew(std::string id);
+
+    void addJotting(const Jotting& jotting);
 
     virtual ~JottingBroker();
 private:

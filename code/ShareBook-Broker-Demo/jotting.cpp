@@ -65,6 +65,15 @@ const std::string Jotting::netizenId() const
     return _netizenProxy.id();
 }
 
+const std::vector<std::string> Jotting::commentId()
+{
+    std::vector<std::string> vector;
+    for(const auto &item:_comments){
+        vector.push_back(item.first);
+    }
+    return vector;
+}
+
 const std::vector<std::string> Jotting::materialId() const
 {
     std::vector<std::string> vector;
@@ -86,7 +95,7 @@ const std::vector<std::string> Jotting::commentId() const
 void Jotting::comment(const std::string commentId)
 {
     _comments.insert(std::pair<std::string,CommentProxy>(commentId, CommentProxy(commentId)));
-    JottingBroker::getInstance()->addChangeCache(id());
+    JottingBroker::getInstance()->cleanToDirtyState(id());
 //     JottingBroker::getInstance()->delete();
 }
 

@@ -30,6 +30,7 @@ public:
     nlohmann::json scanJottings();
     nlohmann::json checkOneJotting(std::string jottingId);
     bool comment(const std::string content,const std::string jottingId);
+    bool publishJotting(std::string content,std::string time );
 
 private:
     std::string m_nickName;

@@ -32,7 +32,7 @@ Material *MaterialBroker::findById(std::string id)
         update();
         //将从数据库中拿出的数据放在缓存中(旧的净缓存)
         m_oldClean.insert({material->id(),*material});
-        m_newCleanId.insert(material->id());
+        m_oldCleanId.insert(material->id());
 
         return material;
     }
@@ -41,17 +41,33 @@ Material *MaterialBroker::findById(std::string id)
 
 Material *MaterialBroker::inCache(std::string id)
 {
-    if(m_oldClean.find(id)!=m_oldClean.end()){
-        //返回material的引用
-        return &m_oldClean.find(id)->second;
+    //判断是否在缓存中
+    auto material=inCache(m_oldClean,m_oldCleanId,id);
+    if(material){
+        return material;
     }
 
-    if(m_newClean.find(id)!=m_newClean.end()){
-        //返回material的引用
-        return &m_newClean.find(id)->second;
+    material=inCache(m_newClean,m_newCleanId,id);
+    if(material){
+        return material;
     }
 
+    return material;
+}
+
+Material *MaterialBroker::inCache(std::unordered_map<std::string, Material> &cache, std::set<std::string> &cacheId, std::string id)
+{
+    //根据id判断是否在缓存中
+    if(cache.find(id)!=cache.end()){
+        //访问量增加，将其Id向“Id队列”的后方移动
+        //先删除再插入
+        cacheId.erase(id);
+        cacheId.insert(id);
+        //返回netizen的引用
+        return &cache.find(id)->second;
+    }
     return nullptr;
+
 }
 
 void MaterialBroker::update()
