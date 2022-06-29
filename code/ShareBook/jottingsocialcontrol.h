@@ -3,20 +3,23 @@
 
 #include "netizen.h"
 #include <unordered_map>
-#include "personaluicontrol.h"
+#include "jotting.h"
+#include <nlohmann/json.hpp>
 
-
-class PersonalUIControl;
 class Material;
+
 class JottingSocialControl
 {
 public:
-    explicit JottingSocialControl();
+    static JottingSocialControl *getInstance();
     ~JottingSocialControl();
-    void login(std::string id);
+    nlohmann::json login(std::string netizenId);
+    nlohmann::json pushJottings(std::string netizenId);
+    nlohmann::json checkOneJotting(std::string netizenId,std::string jottingId);
+    bool comment(std::string netizenId, std::string jottingId, std::string content);
 private:
-//    Netizen *m_netizen;
-//    PersonalUIControl *m_personalUIControl;
+    explicit JottingSocialControl();
+    static JottingSocialControl * m_jottingSocialControl;
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

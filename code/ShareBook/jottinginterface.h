@@ -11,6 +11,7 @@ public:
     virtual ~JottingInterface(){}
 
     virtual nlohmann::json getAbstract()= 0;
+    virtual nlohmann::json getDetail()= 0;
     std::string id() const;
 private:
     std::string m_timeId;

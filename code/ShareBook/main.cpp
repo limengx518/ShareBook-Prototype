@@ -2,7 +2,6 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "personaluicontrol.h"
-#include "roundimage.h"
 #include "jottingsocialcontrol.h"
 
 
@@ -12,7 +11,6 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     qmlRegisterType<PersonalUIControl>("UIControl",1,0,"PersonalUIControl");
-    qmlRegisterType<RoundImage>("UIControl",1,0,"RoundImage");
 
     QQmlApplicationEngine engine;
 

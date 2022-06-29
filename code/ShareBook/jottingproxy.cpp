@@ -17,5 +17,13 @@ nlohmann::json JottingProxy::getAbstract()
     if(_jotting == nullptr){
         _jotting = JottingBroker::getInstance()->findById(id());
     }
-     return _jotting->getAbstract();
+    return _jotting->getAbstract();
+}
+
+nlohmann::json JottingProxy::getDetail()
+{
+    if(_jotting == nullptr){
+        _jotting = JottingBroker::getInstance()->findById(id());
+    }
+    return _jotting->getDetail();
 }

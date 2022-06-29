@@ -12,7 +12,8 @@ Item {
     readonly property url personalJottingList: "qrc:/qml/qml/PersonalJottingList.qml"
     readonly property url personalRelationList: "qrc:/qml/qml/PersonalRelationList.qml"
 
-    property var jsonData:JSON.parse(netizen.jottings)
+    property var netizenInfo:JSON.parse(netizen.netizenInfo)
+    property var jsonData:netizenInfo.jottings
 
     ScrollView{
         anchors.fill: parent
@@ -58,7 +59,7 @@ Item {
                             id: interest_count
                             font.pixelSize:25
                             Layout.alignment: Qt.AlignHCenter
-                            text: qsTr(netizen.interestCount)
+                            text: qsTr(netizenInfo.concernedCount)
                         }
                         Text {
                             font.pixelSize:25
@@ -67,7 +68,7 @@ Item {
                         }
                         TapHandler{
                             onTapped: {
-                                loader.setSource(personalRelationList,{"ownName":netizen.nickName,"dataType":"interest","interestData":JSON.parse(netizen.interest),"fanData":JSON.parse(netizen.fans),"cycleData":JSON.parse(netizen.interest)})
+                                loader.setSource(personalRelationList,{"ownName":netizenInfo.name,"dataType":"interest","interestData":netizenInfo.concerneds,"fanData":netizenInfo.fans,"cycleData":netizenInfo.concerneds})
                                 loader.line=false
                                 loader.buttons=false
                             }
@@ -80,7 +81,7 @@ Item {
                             id: fan_count
                             font.pixelSize:25
                             Layout.alignment: Qt.AlignHCenter
-                            text: qsTr(netizen.fanCount)
+                            text: qsTr(netizenInfo.fanCount)
                         }
                         Text {
                             font.pixelSize:25
@@ -89,7 +90,7 @@ Item {
                         }
                         TapHandler{
                             onTapped: {
-                                loader.setSource(personalRelationList,{"ownName":netizen.nickName,"dataType":"fan","interestData":JSON.parse(netizen.interest),"fanData":JSON.parse(netizen.fans),"cycleData":JSON.parse(netizen.interest)})
+                                loader.setSource(personalRelationList,{"ownName":netizenInfo.name,"dataType":"interest","interestData":netizenInfo.concerneds,"fanData":netizenInfo.fans,"cycleData":netizenInfo.concerneds})
                                 loader.line=false
                                 loader.buttons=false
                             }
@@ -102,7 +103,7 @@ Item {
                             id: cycle_count
                             font.pixelSize:25
                             Layout.alignment: Qt.AlignHCenter
-                            text: qsTr(netizen.interestCount)
+                            text: qsTr(netizenInfo.concernedCount)
                         }
                         Text {
                             font.pixelSize:25
@@ -111,7 +112,7 @@ Item {
                         }
                         TapHandler{
                             onTapped: {
-                                loader.setSource(personalRelationList,{"ownName":netizen.nickName,"dataType":"cycle","interestData":JSON.parse(netizen.interest),"fanData":JSON.parse(netizen.fans),"cycleData":JSON.parse(netizen.interest)})
+                                loader.setSource(personalRelationList,{"ownName":netizenInfo.name,"dataType":"interest","interestData":netizenInfo.concerneds,"fanData":netizenInfo.fans,"cycleData":netizenInfo.concerneds})
                                 loader.line=false
                                 loader.buttons=false
                             }
@@ -128,7 +129,7 @@ Item {
                 anchors.leftMargin: rootWidth*0.03
                 font.pixelSize: 30
                 font.bold: true
-                text: qsTr(netizen.nickName)
+                text: qsTr(netizenInfo.name)
             }
 
             Text {
@@ -178,7 +179,7 @@ Item {
                             rect_own.visible=true
                             rect_like.visible=false
                             rect_collect.visible=false
-                            jsonData=JSON.parse(netizen.jottings)
+                            jsonData=netizenInfo.jottings
                         }
                     }
                 }
@@ -205,7 +206,7 @@ Item {
                             rect_own.visible=false
                             rect_like.visible=true
                             rect_collect.visible=false
-                            jsonData=JSON.parse(netizen.jottings)
+                            jsonData=netizenInfo.jottings
                         }
                     }
                 }
@@ -232,7 +233,7 @@ Item {
                             rect_own.visible=false
                             rect_like.visible=false
                             rect_collect.visible=true
-                            jsonData=JSON.parse(netizen.jottings)
+                            jsonData=netizenInfo.jottings
                         }
                     }
                 }
@@ -267,7 +268,7 @@ Item {
                             spacing: rootHeight*0.01
                             Text {
                                 id: pic
-                                text: jsonData[index].pic_path
+                                text: jsonData[index].material_firstPath
                             }
                             Rectangle{
                                 width: jot.width
@@ -284,7 +285,8 @@ Item {
                         }
                         TapHandler{
                             onTapped: {
-                                loader.source=jsonData[index].file
+                                loader.source="qrc:/qml/qml/JotDetailPage.qml"
+
                             }
                         }
                     }

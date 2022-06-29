@@ -1,18 +1,20 @@
 QT += quick
 
 
-LIBS+=-lmariadbcpp -lredis++ -lhiredis -pthread
+LIBS+=-lmariadbcpp -pthread
+
 
 SOURCES += \
-        main.cpp \
-        personaluicontrol.cpp \
-        roundimage.cpp\
-        cache.cpp \
+        comment.cpp \
+        commentbroker.cpp \
+        commentinterface.cpp \
+        commentproxy.cpp \
         jotting.cpp \
         jottingbroker.cpp \
         jottinginterface.cpp \
         jottingproxy.cpp \
         jottingsocialcontrol.cpp \
+        main.cpp \
         material.cpp \
         materialbroker.cpp \
         materialinterface.cpp \
@@ -21,25 +23,31 @@ SOURCES += \
         netizenbroker.cpp \
         netizeninterface.cpp \
         netizenproxy.cpp \
-        relationalbroker.cpp
+        relationalbroker.cpp\
+        personaluicontrol.cpp \
 
 HEADERS += \
-            cache.h \
-            jotting.h \
-            jottingbroker.h \
-            jottinginterface.h \
-            jottingproxy.h \
-            jottingsocialcontrol.h \
-            material.h \
-            materialbroker.h \
-            materialinterface.h \
-            materialproxy.h \
-            netizen.h \
-            netizenbroker.h \
-            netizeninterface.h \
-            netizenproxy.h \
-            relationalbroker.h
-resources.files = main.qml 
+    comment.h \
+    commentbroker.h \
+    commentinterface.h \
+    commentproxy.h \
+    jotting.h \
+    jottingbroker.h \
+    jottinginterface.h \
+    jottingproxy.h \
+    jottingsocialcontrol.h \
+    material.h \
+    materialbroker.h \
+    materialinterface.h \
+    materialproxy.h \
+    netizen.h \
+    netizenbroker.h \
+    netizeninterface.h \
+    netizenproxy.h \
+    relationalbroker.h \
+    timeInfo.h
+
+resources.files = main.qml
 resources.prefix = /$${TARGET}
 RESOURCES += resources \
     res.qrc
@@ -59,5 +67,4 @@ DISTFILES += \
     PushPage.qml
 
 HEADERS += \
-    personaluicontrol.h \
-    roundimage.h
+    personaluicontrol.h

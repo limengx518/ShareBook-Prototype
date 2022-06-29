@@ -199,10 +199,11 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: rootWidth*0.05
                     spacing: rootWidth*0.1
-                    RoundImage{
+                    Image{
                         id:head_image
                         width: rootWidth*0.15
                         height: rootWidth*0.15
+                        fillMode: Image.PreserveAspectFit
                         source: "qrc:/images/images/avatar.png"
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -214,7 +215,7 @@ Item {
                 }
                 TapHandler{
                     onTapped: {
-                        loader.source=jsonData[index].file
+                        loader.source="qrc:/qml/qml/JotDetailPage.qml"
                     }
                 }
             }

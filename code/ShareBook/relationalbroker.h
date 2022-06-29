@@ -1,7 +1,6 @@
 #ifndef RELATIONALBROKER_H
 #define RELATIONALBROKER_H
 #include <mariadb/conncpp.hpp>
-#include "cache.h"
 
 class Jotting;
 class Netizen;
@@ -16,14 +15,13 @@ public:
     void initDataBase();
 
     sql::ResultSet* query(std::string command);
+    void insert(std::string command);
 
-    std::unordered_map<std::string,std::string> inCache(std::string objectId);
-    void storeObject(std::string key,std::unordered_map<std::string,std::string> map);
-
+    virtual void update()=0;
+    //清除某些缓存
     virtual ~RelationalBroker(){}
 private:
     std::unique_ptr<sql::Connection> m_connection;
-    Cache m_cache;
 };
 
 #endif // RELATIONALBROKER_H

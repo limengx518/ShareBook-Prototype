@@ -19,7 +19,7 @@ const std::string Material::jottingId() const
 
 std::string Material::getAbstract()
 {
-    return m_path;
+    return path();
 }
 
 const std::string &Material::path() const

@@ -4,7 +4,10 @@
 #include "relationalbroker.h"
 #include "material.h"
 #include <unordered_map>
-#include "cache.h"
+#include <set>
+
+#define MAX_CAPACITY 30
+#define DELETE_COUNT 15
 
 class MaterialBroker:public RelationalBroker
 {
@@ -13,14 +16,21 @@ public:
 
     Material *findById(std::string id);
 
-    Material* inCache(std::string objectId);
-    void storeObject(const Material& material);
+    Material* inCache(std::string id);
+    Material* inCache(std::unordered_map<std::string, Material> &cache, std::set<std::string>& cacheId, std::string id);
 
-    virtual ~MaterialBroker(){};
+    void update() override;
+
+    virtual ~MaterialBroker();
 private:
     MaterialBroker();
     static MaterialBroker* m_materialBroker;
-//    std::unordered_map<std::string, Material> _materialsCache;
+
+    std::unordered_map<std::string,Material> m_newClean;
+    std::set<std::string> m_newCleanId;
+
+    std::unordered_map<std::string,Material> m_oldClean;
+    std::set<std::string> m_oldCleanId;
 };
 
 #endif // MATERIALBROKER_H
