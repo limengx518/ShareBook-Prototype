@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/ShareBook">
+<file alias="main.qml">/root/ShareBook/code/ShareBook/main.qml</file>
+</qresource>
+</RCC>
