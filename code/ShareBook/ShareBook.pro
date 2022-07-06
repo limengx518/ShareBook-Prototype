@@ -3,7 +3,7 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS+=-lmariadbcpp -lredis++ -lhiredis -pthread
+LIBS+=-lmariadbcpp -pthread -lboost_system -lpthread -lboost_timer
 
 
 SOURCES += \
