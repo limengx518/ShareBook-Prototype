@@ -8,6 +8,8 @@
 PersonalUIControl::PersonalUIControl(QObject *parent):
     QObject(parent)
 {
+    NetizenBroker * broker=NetizenBroker::getInstance();
+    broker->initDataBase();
 
 }
 
@@ -45,6 +47,7 @@ QString PersonalUIControl::getNetizenInfo() const
 
 void PersonalUIControl::initData()
 {
+
     nlohmann::json netizenInfo=JottingSocialControl::getInstance()->login("1");
 //    m_nikeName="Sofia";
     m_sign="smile pasta pasta";
