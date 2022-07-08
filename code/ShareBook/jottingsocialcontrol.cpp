@@ -13,20 +13,10 @@
 #include "material.h"
 
 
-JottingSocialControl* JottingSocialControl::m_jottingSocialControl=NULL;
-
 using json = nlohmann::json;
 
 JottingSocialControl::JottingSocialControl()
 {
-}
-
-JottingSocialControl *JottingSocialControl::getInstance()
-{
-    if(m_jottingSocialControl==nullptr){
-        m_jottingSocialControl=new JottingSocialControl();
-    }
-    return m_jottingSocialControl;
 }
 
 JottingSocialControl::~JottingSocialControl()
@@ -60,3 +50,9 @@ bool JottingSocialControl::comment(std::string netizenId, std::string jottingId,
     return true;
 }
 
+bool JottingSocialControl::publishJotting(std::string netizenId, std::string content)
+{
+    Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
+    netizen->publishJotting(content);
+    return true;
+}

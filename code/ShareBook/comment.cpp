@@ -12,8 +12,12 @@ using json = nlohmann::json;
 //{
 //}
 
-Comment::Comment(const std::string id, std::string content, std::string netizenId, std::string jottingId):
-    CommentInterface(id),_netizenProxy(netizenId),_jottingProxy(jottingId),m_content{content}
+Comment::Comment(const std::string id, std::string content,std::string time, std::string netizenId, std::string jottingId):
+    CommentInterface(id),
+    _netizenProxy(netizenId),
+    _jottingProxy(jottingId),
+    m_content{content},
+    m_time{time}
 {
 
 }
@@ -22,6 +26,7 @@ nlohmann::json Comment::getInfo()
 {
     json commentInfo;
     commentInfo["content"]=m_content;
+    commentInfo["time"]=m_time;
     commentInfo["netizen"]=_netizenProxy.getAbstract();
     return commentInfo;
 }

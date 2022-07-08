@@ -12,6 +12,10 @@ public:
 
     virtual nlohmann::json getAbstract()  = 0;
     std::string id() const;
+
+    virtual bool isOnline()=0;
+    virtual void updateMessage(std::string messageId)=0;
+
 private:
     std::string m_id;
 };

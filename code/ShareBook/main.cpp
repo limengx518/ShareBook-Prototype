@@ -1,26 +1,34 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include "personaluicontrol.h"
+//#include <iostream>
+#include "relationalbroker.h"
+#include "netizenbroker.h"
+#include "jottingbroker.h"
 #include "jottingsocialcontrol.h"
 
+using namespace std;
 
-int main(int argc, char *argv[])
+#include <unordered_set>
+
+int main()
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication app(argc, argv);
+//        JottingBroker * broker=JottingBroker::getInstance();
+//        broker->initDataBase();
 
-    qmlRegisterType<PersonalUIControl>("UIControl",1,0,"PersonalUIControl");
+    JottingSocialControl control;
 
-    QQmlApplicationEngine engine;
+    /*
+    cout<<"\n========网民登录=========\n"<<endl;
+    cout<<control.login("3695181824").dump(4)<<endl;
+    cout<<"\n========推送笔记=========\n"<<endl;
+    cout<<control.pushJottings("3695181824").dump(4)<<endl;
+    cout<<"\n========详情查看某一笔记=========\n"<<endl;
+    cout<<control.checkOneJotting("3695181824","3405774848").dump(4)<<endl;
+    */
 
-    const QUrl url(u"qrc:/ShareBook/main.qml"_qs);
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
+    cout<<"\n========发布笔记=========\n"<<endl;
+    cout<<control.publishJotting("3699376128","今天天气不错")<<endl;
 
-    engine.load(url);
-    return app.exec();
+
+//    control.addComment("1","1","hahahah");
+
+    return 0;
 }

@@ -9,6 +9,8 @@
 #include "netizeninterface.h"
 #include "netizenproxy.h"
 #include <nlohmann/json.hpp>
+#include <set>
+#include "jottingnotification.h"
 
 class Netizen:public NetizenInterface
 {
@@ -30,14 +32,26 @@ public:
     nlohmann::json scanJottings();
     nlohmann::json checkOneJotting(std::string jottingId);
     bool comment(const std::string content,const std::string jottingId);
-    bool publishJotting(std::string content,std::string time );
+    bool publishJotting(std::string content);
+
+    void updateMessage(std::string messageId) override;    //更新消息关联
+    virtual bool isOnline() override;   //判断是否在线
+
+    nlohmann::json scanMessages();
+    nlohmann::json checkMessage(std::string messageId);   //查看某个消息
 
 private:
     std::string m_nickName;
+    std::string m_signal;
     std::unordered_map<std::string, JottingProxy> _jottings;
     std::unordered_map<std::string, NetizenProxy> _fans;
     std::unordered_map<std::string, NetizenProxy> _concerneds;
     std::unordered_map<std::string, CommentProxy> _comments;
+
+    std::set<std::string> _messages;
+    bool m_online;
+
+    void removeMessage(std::string id);
 };
 
 #endif // NETIZEN_H

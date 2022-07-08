@@ -13,7 +13,7 @@ class Comment: public CommentInterface
 {
 public:
 //    explicit Comment(const std::string &tid,std::string publisherId);
-    explicit Comment(const std::string id,std::string content,std::string publisherId,std::string jottingId);
+    explicit Comment(const std::string id,std::string content,std::string time,std::string publisherId,std::string jottingId);
     virtual ~Comment(){}
 
     virtual nlohmann::json getInfo() override;
@@ -26,6 +26,7 @@ private:
     NetizenProxy _netizenProxy;
     JottingProxy _jottingProxy;
     std::string m_content;
+    std::string m_time;
 };
 
 #endif // COMMENT_H

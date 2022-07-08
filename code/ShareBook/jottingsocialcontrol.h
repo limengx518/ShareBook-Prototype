@@ -11,15 +11,13 @@ class Material;
 class JottingSocialControl
 {
 public:
-    static JottingSocialControl *getInstance();
+    explicit JottingSocialControl();
     ~JottingSocialControl();
     nlohmann::json login(std::string netizenId);
     nlohmann::json pushJottings(std::string netizenId);
     nlohmann::json checkOneJotting(std::string netizenId,std::string jottingId);
     bool comment(std::string netizenId, std::string jottingId, std::string content);
-private:
-    explicit JottingSocialControl();
-    static JottingSocialControl * m_jottingSocialControl;
+    bool publishJotting(std::string netizenId,std::string content);
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

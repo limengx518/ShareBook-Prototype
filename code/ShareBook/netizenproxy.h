@@ -11,6 +11,9 @@ public:
     explicit NetizenProxy(const std::string &tid);
     virtual ~NetizenProxy();
     virtual nlohmann::json getAbstract() override;
+
+    virtual bool isOnline() override;
+    virtual void updateMessage(std::string id) override;
 private:
     Netizen *_netizen;
 };

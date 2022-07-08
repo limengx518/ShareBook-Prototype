@@ -11,6 +11,9 @@
 #include "commentbroker.h"
 #include <iostream>
 #include <fstream>
+#include "jottingnotification.h"
+#include "messagesequence.h"
+#include "snowflakeidworker.h"
 
 using json = nlohmann::json;
 
@@ -41,21 +44,23 @@ nlohmann::json Netizen::getInfo()
 {
     json netizenInfo;
     netizenInfo["name"]=m_nickName;
-
     for(auto &jp:_jottings){
         json jotting=jp.second.getAbstract();
-        netizenInfo["jottings"].push_back(jotting);
+        netizenInfo["jottings"][jp.first]["netizen"]=jotting["netizen"];
+        netizenInfo["jottings"][jp.first]["content"]=jotting["content"];
+        netizenInfo["jottings"][jp.first]["time"]=jotting["time"];
+        netizenInfo["jottings"][jp.first]["material"]=jotting["material_firstPath"];
     }
-    netizenInfo["fanCount"]=std::to_string(_fans.size());
     for(auto &fp:_fans){
        json netizenAbstract=fp.second.getAbstract();
-       netizenInfo["fans"].push_back(netizenAbstract);
+       netizenInfo["fans"][fp.first]["nickName"]=netizenAbstract["nickName"];
     }
-    netizenInfo["concernedCount"]=std::to_string(_concerneds.size());
     for(auto &cp:_concerneds){
        json netizenAbstract=cp.second.getAbstract();
-       netizenInfo["concerneds"].push_back(netizenAbstract);
+       netizenInfo["concerneds"][cp.first]["nickName"]=netizenAbstract["nickName"];
     }
+
+
 //    std::cout<<netizenInfo.dump(4)<<std::endl;
 
     return netizenInfo;
@@ -140,6 +145,7 @@ void Netizen::writeLog()
 
 nlohmann::json Netizen::scanJottings()
 {
+    //根据时间差推送笔记
     std::vector<JottingProxy> jottingProxys=JottingBroker::getInstance()->pushJottings(id(),readLog(),getTime());
     json jottings;
     for(auto &item:jottingProxys){
@@ -158,11 +164,12 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
 {
     //获取创建时间
     std::string time=getTime();
-    time.erase(std::find(time.begin(), time.end(), '-'));
-    time.erase(std::find(time.begin(), time.end(), '-'));
+
+    //创建comment的id
+    unsigned int commend_id=Singleton<IdWorker>::instance().nextId();
 
     //创建笔记对象
-    Comment *comment=new Comment(time,content,id(),jottingId);
+    Comment *comment=new Comment(std::to_string(commend_id),content,time,id(),jottingId);
 
     //将笔记对象存入newCleanCache缓存
     CommentBroker::getInstance()->addComment(*comment);
@@ -180,11 +187,17 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
     return true;
 }
 
-bool Netizen::publishJotting(std::string content, std::string time)
+bool Netizen::publishJotting(std::string content)
 {
     std::vector<std::string> vec;
+    //获取创建时间
+    std::string time=getTime();
+
+    //创建jotting的id
+    unsigned int jotting_id=Singleton<IdWorker>::instance().nextId();
+
     //创建笔记对象
-    Jotting* jotting=new Jotting(time,content,time,id(),vec,vec);
+    Jotting* jotting=new Jotting(std::to_string(jotting_id),content,time,id(),vec,vec);
 
      //将笔记对象存入newCleanCache缓存
     JottingBroker::getInstance()->addJotting(*jotting);
@@ -193,7 +206,55 @@ bool Netizen::publishJotting(std::string content, std::string time)
     _jottings.insert(std::pair<std::string,JottingProxy>(jotting->id(),JottingProxy(jotting->id())));
     NetizenBroker::getInstance()->cleanToDirtyState(id());
 
+
+    //发送给所有粉丝“发布笔记”的消息
+    std::string message_content="你关注的人有新的笔记";
+    //创建jotting的id
+    unsigned int message_id=Singleton<IdWorker>::instance().nextId();
+    //将JottingNotification加入消息队列中
+    MessageSequence::getInstance()->pushNotification(JottingNotification(std::to_string(message_id),id(),_fans,message_content,time,jotting->id()));
+
     return true;
 }
 
+void Netizen::updateMessage(std::string messageId)
+{
+    _messages.insert(messageId);
+}
+
+bool Netizen::isOnline()
+{
+    return m_online;
+}
+
+nlohmann::json Netizen::scanMessages()
+{
+    json messages;
+    for(auto &messageId:_messages){
+        JottingNotification *notification=MessageSequence::getInstance()->findById(messageId);
+        json message;
+        message["id"]=messageId;
+        message["senderName"]=NetizenBroker::getInstance()->findById(notification->senderId())->nickName();
+        message["content"]=notification->content();
+        message["time"]=notification->time();
+        messages.push_back(message);
+    }
+    return messages;
+}
+
+nlohmann::json Netizen::checkMessage(std::string messageId)
+{
+    //删除查看的消息关联
+    _messages.erase(messageId);
+
+    //查找message所指定的笔记id
+    JottingNotification *notification=MessageSequence::getInstance()->findById(messageId);
+    std::string jottingId=notification->jottingId();
+
+    //删除此消息里订阅者中该netizen的id,防止下次再次发送相同消息给此netizen
+    MessageSequence::getInstance()->removeMessageSubscriber(messageId,id());
+
+    //返回笔记的详情内容
+    return checkOneJotting(jottingId);
+}
 

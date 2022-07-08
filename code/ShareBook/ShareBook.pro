@@ -1,7 +1,9 @@
-QT += quick
+TEMPLATE = app
+CONFIG += console c++17
+CONFIG -= app_bundle
+CONFIG -= qt
 
-
-LIBS+=-lmariadbcpp -pthread
+LIBS+=-lmariadbcpp -pthread -lboost_system -lpthread -lboost_timer
 
 
 SOURCES += \
@@ -12,6 +14,7 @@ SOURCES += \
         jotting.cpp \
         jottingbroker.cpp \
         jottinginterface.cpp \
+        jottingnotification.cpp \
         jottingproxy.cpp \
         jottingsocialcontrol.cpp \
         main.cpp \
@@ -19,12 +22,13 @@ SOURCES += \
         materialbroker.cpp \
         materialinterface.cpp \
         materialproxy.cpp \
+        messagesequence.cpp \
         netizen.cpp \
         netizenbroker.cpp \
         netizeninterface.cpp \
         netizenproxy.cpp \
-        relationalbroker.cpp\
-        personaluicontrol.cpp \
+        relationalbroker.cpp \
+        snowflakeidworker.cpp
 
 HEADERS += \
     comment.h \
@@ -34,37 +38,20 @@ HEADERS += \
     jotting.h \
     jottingbroker.h \
     jottinginterface.h \
+    jottingnotification.h \
     jottingproxy.h \
     jottingsocialcontrol.h \
     material.h \
     materialbroker.h \
     materialinterface.h \
     materialproxy.h \
+    messagesequence.h \
     netizen.h \
     netizenbroker.h \
     netizeninterface.h \
     netizenproxy.h \
     relationalbroker.h \
+    snowflake_noncopyable.h \
+    snowflake_singleton.h \
+    snowflakeidworker.h \
     timeInfo.h
-
-resources.files = main.qml
-resources.prefix = /$${TARGET}
-RESOURCES += resources \
-    res.qrc
-
-# Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
-
-# Additional import path used to resolve QML modules just for Qt Quick Designer
-QML_DESIGNER_IMPORT_PATH =
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    PushPage.qml
-
-HEADERS += \
-    personaluicontrol.h

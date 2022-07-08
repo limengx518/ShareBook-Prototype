@@ -18,3 +18,19 @@ nlohmann::json NetizenProxy::getAbstract()
     }
     return _netizen->getAbstract();
 }
+
+bool NetizenProxy::isOnline()
+{
+    if(_netizen==nullptr){
+        _netizen=NetizenBroker::getInstance()->findById(id());
+    }
+    return _netizen->isOnline();
+}
+
+void NetizenProxy::updateMessage(std::string messageId)
+{
+    if(_netizen==nullptr){
+        _netizen=NetizenBroker::getInstance()->findById(id());
+    }
+    return _netizen->updateMessage(messageId);
+}

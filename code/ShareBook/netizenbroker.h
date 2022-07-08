@@ -5,9 +5,6 @@
 #include "netizen.h"
 #include <set>
 
-#define MAX_CAPACITY 30
-#define DELETE_COUNT 15
-
 class NetizenBroker:public RelationalBroker
 {
 public:
@@ -19,12 +16,6 @@ public:
     std::vector<std::string> findConcereds(std::string netizenId);
     std::vector<std::string> findComments(std::string netizenId);
 
-    Netizen *inCache(std::string id);
-    Netizen *inCache(std::unordered_map<std::string,Netizen>& cache,std::set<std::string>& cacheId,std::string id);
-
-    void update() override;
-    void updateCache(std::unordered_map<std::string,Netizen>& cache,std::set<std::string>& cacheId,bool isDirty);
-
     void cleanToDirtyState(std::string id);   //更新的操作时改变缓存
 
     virtual ~NetizenBroker();
@@ -34,16 +25,18 @@ private:
     static NetizenBroker *m_netizenBroker;
 
     std::unordered_map<std::string,Netizen> m_newClean;
-    std::set<std::string> m_newCleanId;
 
     std::unordered_map<std::string,Netizen> m_oldClean;
-    std::set<std::string> m_oldCleanId;
 
     std::unordered_map<std::string,Netizen> m_newDirty;
-    std::set<std::string> m_newDirtyId;
 
     std::unordered_map<std::string,Netizen> m_oldDirty;
-    std::set<std::string> m_oldDirtyId;
+
+    Netizen *inCache(std::string id);
+    void threadRefresh();
+    void refresh(const boost::system::error_code &error_code,boost::asio::deadline_timer* timer);
+
+    std::mutex m_mutex;
 };
 
 #endif // NETIZENBROKER_H
