@@ -1,9 +1,14 @@
 
 
 #include "netizenbroker.h"
+#include "commentbroker.h"
 #include "jottingbroker.h"
 
 NetizenBroker* NetizenBroker::m_netizenBroker=NULL;
+std::unordered_map<std::string,Netizen> NetizenBroker::m_newClean={};
+std::unordered_map<std::string,Netizen> NetizenBroker::m_oldClean={};
+std::multimap<std::string,std::string>  NetizenBroker::m_newFollow={};
+std::mutex NetizenBroker::m_mutex={};
 
 NetizenBroker *NetizenBroker::getInstance()
 {
@@ -13,35 +18,30 @@ NetizenBroker *NetizenBroker::getInstance()
     return m_netizenBroker;
 }
 
-Netizen *NetizenBroker::findById(std::string id)
+Netizen &NetizenBroker::findById(std::string id)
 {
     Netizen * netizen=inCache(id);
     if(netizen==nullptr){
-        std::string com="select * from Netizen where N_id="+id;
-        std::string id,nickName;
-        sql::ResultSet* res=RelationalBroker::query(com);
-        // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getUInt(1));
-            nickName=res->getString(2);
-        }
-        //retrieveJotting(id)
-        netizen=new Netizen(id,nickName,findJottings(id),findFans(id),findConcereds(id),findComments(id));
-        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-        m_oldClean.insert({netizen->id(),*netizen});
+        return retrieveNetizen(id);
     }
-    return netizen;
+    return *netizen;
 }
 
 
 std::vector<std::string> NetizenBroker::findJottings(std::string netizenId)
 {
+    //从数据库中将所有netizen发布的jotting的id拿出来
     std::string com="select J_id from Jotting where N_id="+netizenId;
     sql::ResultSet* res=RelationalBroker::query(com);
     std::vector<std::string> jottingIds;
     while (res->next()) {
         jottingIds.push_back(std::to_string(res->getUInt(1)));
     }
+
+    //查看jotting的缓存中是否有该netizen新发布的笔记还未存入数据库
+    std::vector<std::string> newCacheJotting=JottingBroker::getInstance()->findNewJottings(netizenId);
+    jottingIds.insert(jottingIds.end(),newCacheJotting.begin(),newCacheJotting.end());
+
     return jottingIds;
 
 }
@@ -50,36 +50,90 @@ std::vector<std::string> NetizenBroker::findFans(std::string netizenId)
 {
     std::string com="select N_Fan_id from Relation where N_id="+netizenId;
     std::vector<std::string> fansIds;
-     sql::ResultSet* res=RelationalBroker::query(com);
-     while (res->next()) {
-         fansIds.push_back(std::to_string(res->getUInt(1)));
-     }
+    sql::ResultSet* res=RelationalBroker::query(com);
+    while (res->next()) {
+         fansIds.push_back(std::to_string(res->getInt(1)));
+    }
+
+    std::vector<std::string> newCacheFans=findNewFans(netizenId);
+    fansIds.insert(fansIds.end(),newCacheFans.begin(),newCacheFans.end());
+
     return fansIds;
 }
 
 std::vector<std::string> NetizenBroker::findConcereds(std::string netizenId)
 {
-    std::string com="select N_id from Relation where N_Fan_id="+netizenId;
-    std::vector<std::string> conceredIds;
-     sql::ResultSet* res=RelationalBroker::query(com);
 
-     while (res->next()) {
-         conceredIds.push_back(std::to_string(res->getUInt(1)));
-     }
-    return conceredIds;
+    std::string com="select R_id from Relation where N_Fan_id="+netizenId;
+    std::vector<std::string> concernedIds;
+    sql::ResultSet* res=RelationalBroker::query(com);
+    while (res->next()) {
+         concernedIds.push_back(std::to_string(res->getInt(1)));
+    }
+
+    std::vector<std::string> newCacheConcerneds=findNewFans(netizenId);
+    concernedIds.insert(concernedIds.end(),newCacheConcerneds.begin(),newCacheConcerneds.end());
+
+    return concernedIds;
 
 }
 
 std::vector<std::string> NetizenBroker::findComments(std::string netizenId)
 {
-    std::string com="select C_id from Comment where J_id="+netizenId;
+    std::string com="select C_id from Comment where N_id="+netizenId;
     std::vector<std::string> commentIds;
     sql::ResultSet* res=RelationalBroker::query(com);
+    while (res->next()) {
+         commentIds.push_back(std::to_string(res->getInt(1)));
+    }
 
-     while (res->next()) {
-         commentIds.push_back(std::to_string(res->getUInt(1)));
-     }
-     return commentIds;
+    std::vector<std::string> newCacheComments=CommentBroker::getInstance()->findNewComments(netizenId);
+    commentIds.insert(commentIds.end(),newCacheComments.begin(),newCacheComments.end());
+
+    return commentIds;
+}
+
+std::vector<std::string> NetizenBroker::findNewFans(std::string netizenId)
+{
+    std::vector<std::string> fansId;
+    for(auto& item:m_newFollow){
+        if(item.first==netizenId){
+            fansId.push_back(item.second);
+        }
+    }
+
+    return fansId;
+}
+
+std::vector<std::string> NetizenBroker::findNewConcerneds(std::string netizenId)
+{
+    std::vector<std::string> concernedsId;
+    for(auto& item:m_newFollow){
+        if(item.second==netizenId){
+            concernedsId.push_back(item.first);
+        }
+    }
+
+    return concernedsId;
+
+}
+
+Netizen &NetizenBroker::retrieveNetizen(std::string netizenId)
+{
+    std::string com="select * from Netizen where N_id="+netizenId;
+    std::string id,nickName;
+    sql::ResultSet* res=RelationalBroker::query(com);
+    // Loop through and print results
+    while (res->next()) {
+        id=std::to_string(res->getInt(1));
+        nickName=res->getString(2);
+    }
+    Netizen netizen(id,nickName,findJottings(id),findFans(id),findConcereds(id),findComments(id));
+
+    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+    m_oldClean.insert({netizen.id(),netizen});
+
+    return m_oldClean.at(netizen.id()) ;
 }
 
 Netizen *NetizenBroker::inCache(std::string id)
@@ -93,69 +147,78 @@ Netizen *NetizenBroker::inCache(std::string id)
         return &m_newClean.at(id);
     }
 
-    if(m_oldDirty.count(id)){
-        return &m_oldDirty.at(id);
-    }
-
-    if(m_newDirty.count(id)){
-        return &m_newDirty.at(id);
-    }
 
     return nullptr;
 }
 
-void NetizenBroker::cleanToDirtyState(std::string id)
-{
-    //将netiezn从clean移入dirty
-    //并从dirty中删除
-    auto netizen=m_newClean.find(id);
-    if(netizen!=m_newClean.end()){
-        m_newDirty.insert(*netizen);
-        m_newClean.erase(netizen);
-    }else{
-        netizen=m_oldClean.find(id);
-        m_oldDirty.insert(*netizen);
-        m_oldClean.erase(netizen);
-    }
-}
 
 
 NetizenBroker::~NetizenBroker()
 {
     //程序退出后，将缓存中的新数据存入数据库
     for(auto &netizen:m_newClean){
-        std::string command="insert into Netizen (N_id,N_nickName) values("+netizen.second.id()+","+netizen.second.nickName()+")";
+        std::string command="insert into Netizen values ("+netizen.first+",'"+netizen.second.nickName()+"')";
         RelationalBroker::insert(command);
     }
-    for(auto &netizen:m_newDirty){
-        std::string command="insert into Netizen (N_id,N_nickName) values("+netizen.second.id()+","+netizen.second.nickName()+")";
-        RelationalBroker::insert(command);
-    }
-    for(auto &netizen:m_oldDirty){
-        std::string command="insert into Netizen (N_id,N_nickName) values("+netizen.second.id()+","+netizen.second.nickName()+")";
+
+    for(auto iter = m_newFollow.begin(); iter != m_newFollow.end(); iter++){
+        std::string command="insert into Relation values ("+iter->first+","+iter->second+")";
         RelationalBroker::insert(command);
     }
 }
 
-void NetizenBroker::threadRefresh()
+
+void NetizenBroker::newCleanFlush()
 {
-    boost::asio::io_service io_service;
-    boost::asio::deadline_timer timer(io_service,boost::posix_time::seconds(30));
-    timer.async_wait(boost::bind(&NetizenBroker::refresh,this,boost::asio::placeholders::error(),&timer));
-    io_service.run();
+    for(auto iter = m_newClean.begin(); iter != m_newClean.end();){
+
+        //应该保证当进行插入时，数据是不可以被其他线程所更改的
+        std::lock_guard<std::mutex> lk(m_mutex);
+
+        std::string command="insert into Netizen values ("+iter->first+",'"+iter->second.nickName()+"')";
+        RelationalBroker::insert(command);
+
+        //从缓存中删除相关数据
+        std::cout<<"从缓存中删除"<<std::endl;
+        //unordered_map这种链表型容器erase后返回的迭代器为当前的位置
+        m_newClean.erase(iter++);
+    }
 }
 
-void NetizenBroker::refresh(const boost::system::error_code &error_code,boost::asio::deadline_timer* timer)
+
+void NetizenBroker::newFollowFlush()
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
-    std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values(6,'hello world','2022-07-06 10:05:01',1)";
-    RelationalBroker::insert(command);
-    timer->expires_at(timer->expires_at() + boost::posix_time::seconds(30));
-    timer->async_wait(boost::bind(&NetizenBroker::refresh,this,boost::asio::placeholders::error,timer));
+    for(auto iter = m_newFollow.begin(); iter != m_newFollow.end();){
+
+        //应该保证当进行插入时，数据是不可以被其他线程所更改的
+        std::lock_guard<std::mutex> lk(m_mutex);
+
+        std::string command="insert into Relation values ("+iter->first+","+iter->second+")";
+        RelationalBroker::insert(command);
+
+        //从缓存中删除相关数据
+        std::cout<<"从缓存中删除"<<std::endl;
+        //unordered_map这种链表型容器erase后返回的迭代器为当前的位置
+        m_newFollow.erase(iter++);
+    }
+}
+
+
+void NetizenBroker::flush()
+{
+    newCleanFlush();
+    newFollowFlush();
 }
 
 NetizenBroker::NetizenBroker()
 {
-//    std::thread t(&NetizenBroker::threadRefresh,this);
-//    t.join();
+
+//    m_newFollow.insert({"9","1"});
+//    m_newFollow.insert({"1","9"});
+
+//    Netizen netizen("9","harward",{},{},{},{});
+//    Netizen netizen1("10","李梦雪",{},{},{},{});
+//    m_newClean.insert({netizen.id(),netizen});
+//    m_newClean.insert({netizen1.id(),netizen1});
+
 }

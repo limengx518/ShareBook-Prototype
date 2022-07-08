@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "jotting.h"
 #include <nlohmann/json.hpp>
+#include "mytimer.h"
 
 class Material;
 
@@ -20,6 +21,10 @@ public:
     bool publishJotting(std::string netizenId,std::string content);
     nlohmann::json scanMessage(std::string netizenId);
     nlohmann::json checkMessage(std::string netizenId,std::string messageId);
+
+private:
+    static void flush();
+    MyTimer m_timer;
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

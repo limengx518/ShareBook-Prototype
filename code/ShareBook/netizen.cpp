@@ -98,6 +98,15 @@ const std::vector<std::string> Netizen::concerneds() const
     return concerneds;
 }
 
+const std::vector<std::string> Netizen::commentsId() const
+{
+    std::vector<std::string> comments;
+    for(const auto& item:_comments){
+        comments.push_back(item.first);
+    }
+    return comments;
+}
+
 nlohmann::json Netizen::getAbstract()
 {
     json j;
@@ -156,8 +165,8 @@ nlohmann::json Netizen::scanJottings()
 
 nlohmann::json Netizen::checkOneJotting(std::string jottingId)
 {
-    Jotting *jotting=JottingBroker::getInstance()->findById(jottingId);
-    return jotting->getDetail();
+    Jotting jotting=JottingBroker::getInstance()->findById(jottingId);
+    return jotting.getDetail();
 }
 
 bool Netizen::comment(const std::string content, const std::string jottingId)
@@ -174,15 +183,12 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
     //将笔记对象存入newCleanCache缓存
     CommentBroker::getInstance()->addComment(*comment);
 
-    //建立netizen和comment的联系，并将netizen将其改为DirtyCache里
+    //建立netizen和comment的联系
     _comments.insert(std::pair<std::string,CommentProxy>(comment->id(), CommentProxy(comment->id())));
-    NetizenBroker::getInstance()->cleanToDirtyState(id());
 
-    //建立jotting和comment的联系，并将jotting将其改为DirtyCache里
-    Jotting *jotting=JottingBroker::getInstance()->findById(jottingId);
-    jotting->comment(comment->id());
-
-//    NetizenBroker::getInstance()->remove(id());
+    //建立jotting和comment的联系
+    Jotting jotting=JottingBroker::getInstance()->findById(jottingId);
+    jotting.comment(comment->id());
 
     return true;
 }
@@ -202,9 +208,8 @@ bool Netizen::publishJotting(std::string content)
      //将笔记对象存入newCleanCache缓存
     JottingBroker::getInstance()->addJotting(*jotting);
 
-    //建立netizen和comment的联系，并将netizen放到DirtyCache
+    //建立netizen和comment的联系
     _jottings.insert(std::pair<std::string,JottingProxy>(jotting->id(),JottingProxy(jotting->id())));
-    NetizenBroker::getInstance()->cleanToDirtyState(id());
 
 
     //发送给所有粉丝“发布笔记”的消息
@@ -239,7 +244,7 @@ nlohmann::json Netizen::scanMessages()
         JottingNotification *notification=MessageSequence::getInstance()->findById(messageId);
         json message;
         message["id"]=messageId;
-        message["senderName"]=NetizenBroker::getInstance()->findById(notification->senderId())->nickName();
+        message["senderName"]=NetizenBroker::getInstance()->findById(notification->senderId()).nickName();
         message["content"]=notification->content();
         message["time"]=notification->time();
         messages.push_back(message);

@@ -3,9 +3,14 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "materialbroker.h"
 #include "commentbroker.h"
 
 JottingBroker* JottingBroker::m_jottingBroker=NULL;
+std::unordered_map<std::string,Jotting> JottingBroker::m_newClean={};
+std::unordered_map<std::string,Jotting> JottingBroker::m_oldClean={};
+std::mutex JottingBroker::m_mutex={};
+
 
 JottingBroker *JottingBroker::getInstance()
 {
@@ -15,29 +20,36 @@ JottingBroker *JottingBroker::getInstance()
     return m_jottingBroker;
 }
 
-Jotting *JottingBroker::findById(std::string id)
+Jotting &JottingBroker::findById(std::string id)
 {
     Jotting* jotting=inCache(id);
 
     if(jotting == nullptr){
-        std::string command="select * from Jotting where J_id="+id;
-        sql::ResultSet* res=RelationalBroker::query(command);
-        std::string id,content,nid,time;
-         // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getUInt(1));
-            content=res->getString(2);
-            time=res->getString(3);
-            nid=std::to_string(res->getUInt(4));
-        }
-        //retrieveJotting(id)
-        jotting=new Jotting(id,content,time,nid,findMaterials(id),findComments(id));
-
-        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-        m_oldClean.insert({jotting->id(),*jotting});
+        return retrieveJotting(id);
     }
 
-    return jotting;
+    return *jotting;
+}
+
+Jotting &JottingBroker::retrieveJotting(std::string jottingId)
+{
+    std::string command="select * from Jotting where J_id="+jottingId;
+    sql::ResultSet* res=RelationalBroker::query(command);
+    std::string id,content,nid,time;
+     // Loop through and print results
+    while (res->next()) {
+        id=std::to_string(res->getInt(1));
+        content=res->getString(2);
+        time=res->getString(3);
+        nid=std::to_string(res->getInt(4));
+    }
+    //retrieveJotting(id)
+    Jotting jotting(id,content,time,nid,findMaterials(id),findComments(id));
+
+    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+    m_oldClean.insert({jotting.id(),jotting});
+
+    return m_oldClean.at(jotting.id());
 }
 
 std::vector<JottingProxy> JottingBroker::pushJottings(std::string netizenId, std::string lastTime, std::string thisTime)
@@ -66,6 +78,9 @@ std::string com="select M_id from Material where J_id="+jottingId;
     while (res->next()) {
         materialIds.push_back(std::to_string(res->getUInt(1)));
     }
+
+    std::vector<std::string> newMaterials=MaterialBroker::getInstance()->findJottingNewMaterial(jottingId);
+    materialIds.insert(materialIds.begin(),newMaterials.begin(),newMaterials.end());
     return materialIds;
 }
 
@@ -77,7 +92,23 @@ std::string com="select C_id from Comment where J_id="+jottingId;
     while (res->next()) {
         commentIds.push_back(std::to_string(res->getUInt(1)));
     }
+
+    std::vector<std::string> newComments=CommentBroker::getInstance()->findJottingNewComment(jottingId);
+    commentIds.insert(commentIds.begin(),newComments.begin(),newComments.end());
     return commentIds;
+}
+
+std::vector<std::string> JottingBroker::findNewJottings(std::string netizenId)
+{
+    //网民新发布的笔记应该是存在于newCleanCache中
+    std::vector<std::string> res;
+    for(auto& item:m_newClean){
+        if(item.second.netizenId()==netizenId){
+            res.push_back(item.first);
+        }
+    }
+
+    return res;
 }
 
 Jotting* JottingBroker::inCache(std::string id)
@@ -91,61 +122,34 @@ Jotting* JottingBroker::inCache(std::string id)
         return &m_newClean.at(id);
     }
 
-    if(m_oldDirty.count(id)){
-        return &m_oldDirty.at(id);
-    }
-
-    if(m_newDirty.count(id)){
-        return &m_newDirty.at(id);
-    }
-
     return nullptr;
 }
 
-void JottingBroker::threadRefresh()
+void JottingBroker::newCleanFlush()
 {
-    boost::asio::io_service io_service;
-    boost::asio::deadline_timer timer(io_service,boost::posix_time::seconds(30));
-    timer.async_wait(boost::bind(&JottingBroker::refresh,this,boost::asio::placeholders::error(),&timer));
-    io_service.run();
+    for(auto iter = m_newClean.begin(); iter != m_newClean.end();){
+
+           //保证当进行插入时，数据是不可以被更改的？？？？
+           std::unique_lock<std::mutex> lk(m_mutex);
+
+           //将数据插入数据库
+           std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+iter->first+","+"'"+iter->second.note()+"','"+iter->second.time()+"','"+iter->second.netizenId()+"')";
+           RelationalBroker::insert(command);
+
+           //从缓存中删除相关数据
+           std::cout<<"从缓存中删除"<<std::endl;
+           //unordered_map这种链表型容器erase后返回的迭代器为当前的位置
+           m_newClean.erase(iter++);
+           lk.unlock();
+       }
 }
 
-void JottingBroker::refresh(const boost::system::error_code &error_code,boost::asio::deadline_timer* timer)
+
+void JottingBroker::flush()
 {
-//    for(auto &jotting:m_newClean){
-//        std::lock_guard<std::mutex> lk(m_mutex);
-//        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
-//        RelationalBroker::insert(command);
-//    }
-//    for(auto &jotting:m_newDirty){
-//        std::lock_guard<std::mutex> lk(m_mutex);
-//        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
-//        RelationalBroker::insert(command);
-//    }
-//    for(auto &jotting:m_oldDirty){
-//        std::lock_guard<std::mutex> lk(m_mutex);
-//        std::string command="update Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
-//        RelationalBroker::insert(command);
-//    }
-    std::lock_guard<std::mutex> lk(m_mutex);
-    std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values(6,'hello world','2022-07-06 10:05:01',1)";
-    RelationalBroker::insert(command);
-    timer->expires_at(timer->expires_at() + boost::posix_time::seconds(30));
-    timer->async_wait(boost::bind(&JottingBroker::refresh,this,boost::asio::placeholders::error,timer));
+    newCleanFlush();
 }
 
-void JottingBroker::cleanToDirtyState(std::string id)
-{
-    auto jotting=m_newClean.find(id);
-    if(jotting!=m_newClean.end()){
-        m_newDirty.insert(*jotting);
-        m_newClean.erase(jotting);
-    }else{
-        jotting=m_oldClean.find(id);
-        m_oldDirty.insert(*jotting);
-        m_oldClean.erase(jotting);
-    }
-}
 
 void JottingBroker::addJotting(const Jotting &jotting)
 {
@@ -160,18 +164,12 @@ JottingBroker::~JottingBroker()
         std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
         RelationalBroker::insert(command);
     }
-    for(auto &jotting:m_newDirty){
-        std::string command="insert into Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
-        RelationalBroker::insert(command);
-    }
-    for(auto &jotting:m_oldDirty){
-        std::string command="update Jotting (J_id,J_content,J_time,N_id) values("+jotting.second.id()+","+jotting.second.note()+","+jotting.second.time()+","+jotting.second.netizenId()+")";
-        RelationalBroker::insert(command);
-    }
 }
 
 JottingBroker::JottingBroker()
 {
-//    std::thread t(&JottingBroker::threadRefresh,this);
-//    t.join();
+//    Jotting jotting("8","你好","2022-05-22 10:00:01.00","10",{},{});
+//    m_newClean.insert({jotting.id(),jotting});
+//    Jotting jotting1("10","你好","2022-05-22 10:00:01.00","10",{},{});
+//    m_newClean.insert({jotting1.id(),jotting1});
 }

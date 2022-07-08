@@ -15,7 +15,7 @@ JottingProxy::~JottingProxy()
 nlohmann::json JottingProxy::getAbstract()
 {
     if(_jotting == nullptr){
-        _jotting = JottingBroker::getInstance()->findById(id());
+        _jotting = &JottingBroker::getInstance()->findById(id());
     }
     return _jotting->getAbstract();
 }
@@ -23,7 +23,7 @@ nlohmann::json JottingProxy::getAbstract()
 nlohmann::json JottingProxy::getDetail()
 {
     if(_jotting == nullptr){
-        _jotting = JottingBroker::getInstance()->findById(id());
+        _jotting = &JottingBroker::getInstance()->findById(id());
     }
     return _jotting->getDetail();
 }

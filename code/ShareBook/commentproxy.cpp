@@ -14,7 +14,7 @@ CommentProxy::~CommentProxy()
 nlohmann::json CommentProxy::getInfo()
 {
     if(_comment == nullptr){
-        _comment = CommentBroker::getInstance()->findById(id());
+        _comment = &CommentBroker::getInstance()->findById(id());
     }
      return _comment->getInfo();
 

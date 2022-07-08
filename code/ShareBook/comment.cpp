@@ -46,3 +46,8 @@ const std::string Comment::jottingId() const
 {
     return _jottingProxy.id();
 }
+
+const std::string Comment::time()
+{
+    return m_time;
+}

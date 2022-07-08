@@ -1,19 +1,17 @@
 //#include <iostream>
 #include "relationalbroker.h"
+#include "materialbroker.h"
 #include "netizenbroker.h"
 #include "jottingbroker.h"
 #include "jottingsocialcontrol.h"
 #include "messagesequence.h"
+#include <unordered_set>
+#include "commentbroker.h"
 
 using namespace std;
 
-#include <unordered_set>
-
 int main()
 {
-//        JottingBroker * broker=JottingBroker::getInstance();
-//        broker->initDataBase();
-
     JottingSocialControl control;
 
     cout<<"\n========网民登录=========\n"<<endl;
@@ -39,5 +37,8 @@ int main()
 
 //    control.addComment("1","1","hahahah");
 
+
     return 0;
 }
+
+

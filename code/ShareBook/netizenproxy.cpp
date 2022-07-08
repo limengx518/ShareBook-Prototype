@@ -14,7 +14,7 @@ NetizenProxy::~NetizenProxy()
 nlohmann::json NetizenProxy::getAbstract()
 {
     if(_netizen==nullptr){
-        _netizen=NetizenBroker::getInstance()->findById(id());
+        _netizen=&NetizenBroker::getInstance()->findById(id());
     }
     return _netizen->getAbstract();
 }
@@ -22,7 +22,7 @@ nlohmann::json NetizenProxy::getAbstract()
 bool NetizenProxy::isOnline()
 {
     if(_netizen==nullptr){
-        _netizen=NetizenBroker::getInstance()->findById(id());
+        _netizen=&NetizenBroker::getInstance()->findById(id());
     }
     return _netizen->isOnline();
 }
@@ -30,7 +30,7 @@ bool NetizenProxy::isOnline()
 void NetizenProxy::setOnline(bool online)
 {
     if(_netizen==nullptr){
-        _netizen=NetizenBroker::getInstance()->findById(id());
+        _netizen=&NetizenBroker::getInstance()->findById(id());
     }
     _netizen->setOnline(online);
 }
@@ -38,7 +38,7 @@ void NetizenProxy::setOnline(bool online)
 void NetizenProxy::updateMessage(std::string messageId)
 {
     if(_netizen==nullptr){
-        _netizen=NetizenBroker::getInstance()->findById(id());
+        _netizen=&NetizenBroker::getInstance()->findById(id());
     }
     return _netizen->updateMessage(messageId);
 }

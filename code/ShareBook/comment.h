@@ -21,6 +21,7 @@ public:
     const std::string content() const;
     const std::string publisherId() const;
     const std::string jottingId() const;
+    const std::string time();
 
 private:
     NetizenProxy _netizenProxy;

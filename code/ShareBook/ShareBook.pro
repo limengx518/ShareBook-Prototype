@@ -23,6 +23,7 @@ SOURCES += \
         materialinterface.cpp \
         materialproxy.cpp \
         messagesequence.cpp \
+        mytimer.cpp \
         netizen.cpp \
         netizenbroker.cpp \
         netizeninterface.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     materialinterface.h \
     materialproxy.h \
     messagesequence.h \
+    mytimer.h \
     netizen.h \
     netizenbroker.h \
     netizeninterface.h \

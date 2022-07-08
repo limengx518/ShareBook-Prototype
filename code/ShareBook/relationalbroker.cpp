@@ -6,6 +6,8 @@
 #include <string>
 #include "snowflakeidworker.h"
 
+std::unique_ptr<sql::Connection> RelationalBroker::m_connection=NULL;
+
 RelationalBroker::RelationalBroker()
 {
     // Instantiate Driver
