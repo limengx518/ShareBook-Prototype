@@ -1,23 +1,23 @@
 #include <iostream>
 #include "relationalbroker.h"
+#include "materialbroker.h"
 #include "netizenbroker.h"
 #include "jottingbroker.h"
 #include "jottingsocialcontrol.h"
-using namespace std;
+#include "commentbroker.h"
+#include <thread>
 
+using namespace std;
 
 int main()
 {
-        JottingBroker * broker=JottingBroker::getInstance();
-//        broker->initDataBase();
+    JottingSocialControl control{};
+    cout<<control.login("10")<<endl;
 
-//    JottingSocialControl control;
-//    cout<<control.login("1").dump(4)<<endl;
-//    cout<<control.pushJottings("1").dump(4)<<endl;
-//    cout<<control.checkOneJotting("1","2").dump(4)<<endl;
-//    control.pushJottings("2022-4-22 10:00:01","2022-7-22 10:00:03");
-//    control.checkOneJotting("3");
-//    control.addComment("1","1","hahahah");
+    getchar();
+
 
     return 0;
 }
+
+

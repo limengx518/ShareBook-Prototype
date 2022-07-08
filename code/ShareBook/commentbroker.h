@@ -14,23 +14,27 @@ class CommentBroker : public RelationalBroker
 public:
     static CommentBroker *getInstance();
 
-    Comment *findById(std::string id);
+    Comment &findById(std::string id);
     std::vector<std::string> getSomeCommentsId(std::string lastTime,std::string thisTime);
+    std::vector<std::string> findNewComments(std::string netizenId);
+    std::vector<std::string> findJottingNewComment(std::string jottingId);
+
+    Comment& retrieveComment(std::string commentiId);
 
     void addComment(const Comment& comment);
 
     Comment* inCache(std::string id);
+    static void flush();
 
     virtual ~CommentBroker();
 private:
     CommentBroker();
+    static void newCleanFlush();
     static CommentBroker* m_CommentBroker;
 
-    std::unordered_map<std::string,Comment> m_newClean;
-
-    std::unordered_map<std::string,Comment> m_oldClean;
-
-
+    static std::unordered_map<std::string,Comment> m_newClean;
+    static std::unordered_map<std::string,Comment> m_oldClean;
+    static std::mutex m_mutex;
 };
 
 #endif // COMMENTBROKER_H

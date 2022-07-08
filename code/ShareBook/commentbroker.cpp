@@ -6,6 +6,9 @@
 #include <vector>
 
 CommentBroker* CommentBroker::m_CommentBroker=NULL;
+std::unordered_map<std::string,Comment> CommentBroker::m_newClean={};
+std::unordered_map<std::string,Comment> CommentBroker::m_oldClean={};
+std::mutex CommentBroker::m_mutex={};
 
 CommentBroker *CommentBroker::getInstance()
 {
@@ -15,46 +18,66 @@ CommentBroker *CommentBroker::getInstance()
     return m_CommentBroker;
 }
 
-Comment *CommentBroker::findById(std::string id)
+Comment &CommentBroker::findById(std::string id)
 {
     Comment* comment=inCache(id);
     if(comment == nullptr){
-        std::string command="select * from Comment where C_id="+id;
-        sql::ResultSet* res=RelationalBroker::query(command);
-        std::string id,content,nid,jid;
-         // Loop through and print results
-        while (res->next()) {
-            id=std::to_string(res->getInt(1));
-            content=res->getString(2);
-            nid=std::to_string(res->getInt(3));
-            jid=res->getString(4);
-        }
-        //retrieveComment(id)
-        comment=new Comment(id,content,nid,jid);
+        return retrieveComment(id);
+    }
+    return *comment;
+}
 
-        //将从数据库中拿出的数据放在缓存中(旧的净缓存)
-        m_oldClean.insert({comment->id(),*comment});
+std::vector<std::string> CommentBroker::findNewComments(std::string netizenId)
+{
+    std::vector<std::string> commentsId;
+    for(auto& item:m_newClean){
+        if(item.second.publisherId()==netizenId){
+                commentsId.push_back(item.first);
+        }
     }
 
-    std::cout<<"in cache"<<std::endl;
-    return comment;
+    return commentsId;
+
+}
+
+std::vector<std::string> CommentBroker::findJottingNewComment(std::string jottingId)
+{
+    std::vector<std::string> commentsId;
+    for(auto& item:m_newClean){
+        if(item.second.jottingId()==jottingId){
+                commentsId.push_back(item.first);
+        }
+    }
+
+    return commentsId;
+
+}
+
+Comment &CommentBroker::retrieveComment(std::string commentId)
+{
+    std::string command="select * from Comment where C_id="+commentId;
+    sql::ResultSet* res=RelationalBroker::query(command);
+    std::string id,content,nid,jid;
+     // Loop through and print results
+    while (res->next()) {
+        id=std::to_string(res->getInt(1));
+        content=res->getString(2);
+        nid=std::to_string(res->getInt(3));
+        jid=res->getString(4);
+    }
+    //retrieveComment(id)
+    Comment comment(id,content,nid,jid);
+
+    //将从数据库中拿出的数据放在缓存中(旧的净缓存)
+    m_oldClean.insert({comment.id(),comment});
+
+    return m_oldClean.at(comment.id());
 }
 
 void CommentBroker::addComment(const Comment &comment)
 {
-//    std::string id,content,n_id,j_id;
-//    id=comment.id();
-//    content=comment.content();
-//    n_id=comment.publisherId();
-//    j_id=comment.jottingId();
-
-//    std::string command="insert into Comment (C_id,C_content,N_id,J_id) values('"+id+"','"+content+"','"+n_id+"','"+j_id+"')";
-
     //将从数据库中拿出的数据放在缓存中(旧的净缓存)
     m_newClean.insert({comment.id(),comment});
-
-//    std::cout<<command<<std::endl;
-
 }
 
 Comment *CommentBroker::inCache(std::string id)
@@ -71,9 +94,10 @@ Comment *CommentBroker::inCache(std::string id)
     return nullptr;
 }
 
+
 CommentBroker::~CommentBroker()
 {
-    //程序退出后，将缓存中的新数据存入数据库
+    //将缓存中的剩余的数据存入数据库
     for(auto &comment:m_newClean){
         std::string command="insert into Comment (C_id,C_content,N_id,J_id) values("+comment.second.id()+","+comment.second.content()+","+comment.second.publisherId()+","+comment.second.jottingId()+")";
         RelationalBroker::insert(command);
@@ -82,5 +106,29 @@ CommentBroker::~CommentBroker()
 
 CommentBroker::CommentBroker()
 {
+    // explicit Comment(id,content,publisherId,jottingId);
+//    Comment comment1("12","bnag","10","10");
+//    m_newClean.insert({comment1.id(),comment1});
+}
 
+void CommentBroker::flush()
+{
+    newCleanFlush();
+}
+
+void CommentBroker::newCleanFlush()
+{
+    for(auto iter = m_newClean.begin(); iter != m_newClean.end();){
+
+        //应该保证当进行插入时，数据是不可以被其他线程所更改的
+        std::lock_guard<std::mutex> lk(m_mutex);
+
+        std::string command="insert into Comment (C_id,C_content,N_id,J_id) values ("+iter->first+",'"+iter->second.content()+"',"+iter->second.publisherId()+","+iter->second.jottingId()+")";
+        RelationalBroker::insert(command);
+
+        //从缓存中删除相关数据
+        std::cout<<"从缓存中删除"<<std::endl;
+        //unordered_map这种链表型容器erase后返回的迭代器为当前的位置
+        m_newClean.erase(iter++);
+    }
 }

@@ -14,7 +14,7 @@ NetizenProxy::~NetizenProxy()
 nlohmann::json NetizenProxy::getAbstract()
 {
     if(_netizen==nullptr){
-        _netizen=NetizenBroker::getInstance()->findById(id());
+        _netizen=&NetizenBroker::getInstance()->findById(id());
     }
     return _netizen->getAbstract();
 }

@@ -17,12 +17,12 @@ public:
     void initDataBase();
 
     sql::ResultSet* query(std::string command);
-    void insert(std::string command);
+    static void insert(std::string command);
 
     //清除某些缓存
     virtual ~RelationalBroker(){}
 private:
-    std::unique_ptr<sql::Connection> m_connection;
+    static std::unique_ptr<sql::Connection> m_connection;
 };
 
 #endif // RELATIONALBROKER_H

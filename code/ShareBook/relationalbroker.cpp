@@ -5,6 +5,7 @@
 #include "material.h"
 #include <string>
 
+std::unique_ptr<sql::Connection> RelationalBroker::m_connection=NULL;
 RelationalBroker::RelationalBroker()
 {
     // Instantiate Driver

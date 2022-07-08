@@ -29,7 +29,8 @@ nlohmann::json Jotting::getAbstract()
     json j;
     j["content"]=m_content;
     j["time"]=m_time;
-    j["material_firstPath"]=_materials.begin()->second.getAbstract();
+    if(!_materials.empty())
+        j["material_firstPath"]=_materials.begin()->second.getAbstract();
     j["netizen"]=_netizenProxy.getAbstract();
     return j;
 }
@@ -95,7 +96,5 @@ const std::vector<std::string> Jotting::commentId() const
 void Jotting::comment(const std::string commentId)
 {
     _comments.insert(std::pair<std::string,CommentProxy>(commentId, CommentProxy(commentId)));
-    JottingBroker::getInstance()->cleanToDirtyState(id());
-//     JottingBroker::getInstance()->delete();
 }
 
