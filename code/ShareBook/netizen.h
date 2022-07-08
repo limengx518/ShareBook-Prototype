@@ -12,7 +12,8 @@
 #include <set>
 #include "jottingnotification.h"
 
-class Netizen:public NetizenInterface
+class
+        Netizen:public NetizenInterface
 {
 public:
     explicit Netizen(const std::string& tid);
@@ -36,6 +37,7 @@ public:
 
     void updateMessage(std::string messageId) override;    //更新消息关联
     virtual bool isOnline() override;   //判断是否在线
+    virtual void setOnline(bool online) override;
 
     nlohmann::json scanMessages();
     nlohmann::json checkMessage(std::string messageId);   //查看某个消息

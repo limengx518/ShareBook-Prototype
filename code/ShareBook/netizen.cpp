@@ -227,6 +227,11 @@ bool Netizen::isOnline()
     return m_online;
 }
 
+void Netizen::setOnline(bool online)
+{
+    m_online=online;
+}
+
 nlohmann::json Netizen::scanMessages()
 {
     json messages;

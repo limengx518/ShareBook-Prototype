@@ -27,6 +27,14 @@ bool NetizenProxy::isOnline()
     return _netizen->isOnline();
 }
 
+void NetizenProxy::setOnline(bool online)
+{
+    if(_netizen==nullptr){
+        _netizen=NetizenBroker::getInstance()->findById(id());
+    }
+    _netizen->setOnline(online);
+}
+
 void NetizenProxy::updateMessage(std::string messageId)
 {
     if(_netizen==nullptr){

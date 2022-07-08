@@ -1,4 +1,5 @@
 #include "jottingnotification.h"
+#include <iostream>
 
 JottingNotification::JottingNotification(std::string id, std::string senderId, std::string content, std::string time, std::string jottingId,bool expire):
     m_id{id},

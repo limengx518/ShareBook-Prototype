@@ -28,6 +28,7 @@ nlohmann::json JottingSocialControl::login(std::string netizenId)
     Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
     netizen->writeLog();
     netizen->readLog();
+    netizen->setOnline(true);
     return netizen->getInfo();
 }
 
@@ -55,4 +56,16 @@ bool JottingSocialControl::publishJotting(std::string netizenId, std::string con
     Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
     netizen->publishJotting(content);
     return true;
+}
+
+nlohmann::json JottingSocialControl::scanMessage(std::string netizenId)
+{
+    Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
+    return netizen->scanMessages();
+}
+
+nlohmann::json JottingSocialControl::checkMessage(std::string netizenId, std::string messageId)
+{
+    Netizen *netizen=NetizenBroker::getInstance()->findById(netizenId);
+    return netizen->checkMessage(messageId);
 }

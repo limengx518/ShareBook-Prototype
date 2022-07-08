@@ -18,6 +18,8 @@ public:
     nlohmann::json checkOneJotting(std::string netizenId,std::string jottingId);
     bool comment(std::string netizenId, std::string jottingId, std::string content);
     bool publishJotting(std::string netizenId,std::string content);
+    nlohmann::json scanMessage(std::string netizenId);
+    nlohmann::json checkMessage(std::string netizenId,std::string messageId);
 };
 
 #endif // JOTTINGSOCIALCONTROL_H

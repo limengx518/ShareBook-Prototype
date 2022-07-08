@@ -14,6 +14,7 @@ public:
     std::string id() const;
 
     virtual bool isOnline()=0;
+    virtual void setOnline(bool online)=0;
     virtual void updateMessage(std::string messageId)=0;
 
 private:

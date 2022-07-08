@@ -13,6 +13,7 @@ public:
     virtual nlohmann::json getAbstract() override;
 
     virtual bool isOnline() override;
+    virtual void setOnline(bool online) override;
     virtual void updateMessage(std::string id) override;
 private:
     Netizen *_netizen;
