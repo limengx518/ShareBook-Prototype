@@ -57,4 +57,3 @@ sequence_diagram_before中存放的是没有进行版本控制之前的相关截
     2. 全部netizen已读取该通知：粉丝id容器为空，则数据库中删除该通知
     3. 通知已被从sequence出队，在数据库中删除该通知
 
-
