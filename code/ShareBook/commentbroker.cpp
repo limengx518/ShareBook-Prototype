@@ -59,10 +59,10 @@ Comment &CommentBroker::retrieveComment(std::string commentId)
     std::string id,content,nid,jid,time;
      // Loop through and print results
     while (res->next()) {
-        id=std::to_string(res->getInt(1));
+        id=std::to_string(res->getUInt(1));
         content=res->getString(2);
         time=res->getString(3);
-        nid=std::to_string(res->getInt(4));
+        nid=std::to_string(res->getUInt(4));
         jid=res->getString(5);
     }
     //retrieveComment(id)
@@ -93,7 +93,7 @@ CommentBroker::~CommentBroker()
 CommentBroker::CommentBroker()
 {
     // explicit Comment(id,content,publisherId,jottingId);
-//    Comment comment1("12","bnag","10","10");
+//    Comment comment1("12","bnag","2022-07-09 09:41:40","10","10");
 //    m_newClean.insert({comment1.id(),comment1});
 }
 
@@ -110,6 +110,7 @@ void CommentBroker::newCleanFlush()
         std::lock_guard<std::mutex> lk(m_mutex);
 
         std::string command="insert into Comment (C_id,C_content,C_time,N_id,J_id) values("+iter->second.id()+",'"+iter-> second.content()+"','"+iter->second.time()+"',"+iter->second.publisherId()+","+iter->second.jottingId()+")";
+        RelationalBroker::insert(command);
 
         //从缓存中删除相关数据
         std::cout<<"从缓存中删除"<<std::endl;

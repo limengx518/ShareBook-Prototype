@@ -44,9 +44,9 @@ Material &MaterialBroker::retrieveMaterial(std::string materialId)
     std::string id,path,jId;
     // Loop through and print results
     while (res->next()) {
-        id=std::to_string(res->getInt(1));
+        id=std::to_string(res->getUInt(1));
         path=res->getString(2);
-        jId=std::to_string(res->getInt(3));
+        jId=std::to_string(res->getUInt(3));
     }
 
     Material material(id,jId,path);
@@ -61,6 +61,11 @@ Material &MaterialBroker::retrieveMaterial(std::string materialId)
 void MaterialBroker::flush()
 {
     newCacheFlush();
+}
+
+void MaterialBroker::addMaterial(Material material)
+{
+    m_newClean.insert({material.id(),material});
 }
 
 void MaterialBroker::newCacheFlush()

@@ -38,10 +38,10 @@ Jotting &JottingBroker::retrieveJotting(std::string jottingId)
     std::string id,content,nid,time;
      // Loop through and print results
     while (res->next()) {
-        id=std::to_string(res->getInt(1));
+        id=std::to_string(res->getUInt(1));
         content=res->getString(2);
         time=res->getString(3);
-        nid=std::to_string(res->getInt(4));
+        nid=std::to_string(res->getUInt(4));
     }
     //retrieveJotting(id)
     Jotting jotting(id,content,time,nid,findMaterials(id),findComments(id));

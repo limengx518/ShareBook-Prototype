@@ -12,6 +12,7 @@
 #include <ctime>
 #include <thread>
 #include "material.h"
+#include "messagesequence.h"
 
 
 using json = nlohmann::json;
@@ -19,15 +20,18 @@ using json = nlohmann::json;
 JottingSocialControl::JottingSocialControl()
 {
     m_timer.start(30000,flush);
+    m_NotificationTimer.start(10000,NotificationFlush);
 }
 
 JottingSocialControl::~JottingSocialControl()
 {
     m_timer.stop();
+    m_NotificationTimer.stop();
     delete NetizenBroker::getInstance();
     delete JottingBroker::getInstance();
     delete CommentBroker::getInstance();
     delete MaterialBroker::getInstance();
+    delete MessageSequence::getInstance();
 }
 
 nlohmann::json JottingSocialControl::login(std::string netizenId)
@@ -57,11 +61,17 @@ bool JottingSocialControl::comment(std::string netizenId, std::string jottingId,
     return true;
 }
 
-bool JottingSocialControl::publishJotting(std::string netizenId, std::string content)
+bool JottingSocialControl::publishJotting(std::string netizenId, nlohmann::json jottingContent)
 {
     Netizen netizen=NetizenBroker::getInstance()->findById(netizenId);
-    netizen.publishJotting(content);
+    netizen.publishJotting(jottingContent);
     return true;
+}
+
+void JottingSocialControl::follow(std::string nId, std::string concernedId)
+{
+    Netizen netizen=NetizenBroker::getInstance()->findById(nId);
+    netizen.followNetizen(concernedId);
 }
 
 nlohmann::json JottingSocialControl::scanMessage(std::string netizenId)
@@ -82,5 +92,10 @@ void JottingSocialControl::flush()
     JottingBroker::getInstance()->flush();
     CommentBroker::getInstance()->flush();
     MaterialBroker::getInstance()->flush();
+}
 
+void JottingSocialControl::NotificationFlush()
+{
+    std::cout<<"消息推送"<<std::endl;
+    MessageSequence::getInstance()->updateMessageQueue();
 }

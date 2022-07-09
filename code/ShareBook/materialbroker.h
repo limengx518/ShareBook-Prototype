@@ -14,6 +14,7 @@ public:
     Material& findById(std::string id);
     std::vector<std::string> findJottingNewMaterial(std::string jottingId);
     static void flush();
+    void addMaterial(Material material);
     virtual ~MaterialBroker();
 
 private:

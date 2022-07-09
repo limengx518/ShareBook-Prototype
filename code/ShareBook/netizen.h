@@ -33,14 +33,18 @@ public:
     nlohmann::json scanJottings();
     nlohmann::json checkOneJotting(std::string jottingId);
     bool comment(const std::string content,const std::string jottingId);
-    bool publishJotting(std::string content);
+    bool publishJotting(nlohmann::json jotting_json);
 
     void updateMessage(std::string messageId) override;    //更新消息关联
     virtual bool isOnline() override;   //判断是否在线
     virtual void setOnline(bool online) override;
 
+    void followNetizen(std::string concernedId);
+
     nlohmann::json scanMessages();
     nlohmann::json checkMessage(std::string messageId);   //查看某个消息
+    //涨粉
+    void growFan(std::string id);
 
 private:
     std::string m_nickName;

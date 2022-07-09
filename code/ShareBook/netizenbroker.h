@@ -22,6 +22,10 @@ public:
     std::vector<std::string> findNewFans(std::string netizenId);
     std::vector<std::string> findNewConcerneds(std::string netizenId);
     Netizen &retrieveNetizen(std::string netizenId);
+
+    //将关系添加至newCleanCache
+    void addFollowRelation(std::string nId,std::string fanId);
+
     //将cache中的内容刷新至数据库
     void flush();
 

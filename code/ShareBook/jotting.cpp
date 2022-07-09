@@ -24,6 +24,8 @@ Jotting::Jotting(const std::string id, std::string content, std::string time, st
 }
 
 
+
+
 nlohmann::json Jotting::getAbstract()
 {
     json j;

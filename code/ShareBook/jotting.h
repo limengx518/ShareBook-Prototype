@@ -13,6 +13,7 @@ class Jotting : public JottingInterface
 public:
     explicit Jotting(const std::string &tid,std::string netizenId);
     explicit Jotting(const std::string id,std::string content,std::string time,std::string netizenId,std::vector<std::string> materialsId,std::vector<std::string> commentsId);
+
     virtual ~Jotting(){}
 
     virtual nlohmann::json getAbstract() override;

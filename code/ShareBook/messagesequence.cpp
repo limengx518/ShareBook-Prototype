@@ -44,6 +44,11 @@ JottingNotification *MessageSequence::findById(std::string id)
 
 void MessageSequence::updateMessageQueue()
 {
+    //发送消息队列中所有的message
+    for(auto& message:m_messageQueue){
+        message.second.notify();
+    }
+
     for(auto& message:m_messageQueue){
         std::string com="select Recipient_id from JottingNotificationRelation where JN_id="+message.first;
         sql::ResultSet* res=RelationalBroker::query(com);
@@ -54,11 +59,6 @@ void MessageSequence::updateMessageQueue()
                 RelationalBroker::drop(com_relation);
             }
         }
-    }
-
-    //更新后，发送消息队列中所有的message
-    for(auto& message:m_messageQueue){
-        message.second.notify();
     }
 }
 

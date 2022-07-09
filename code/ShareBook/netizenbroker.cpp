@@ -52,7 +52,7 @@ std::vector<std::string> NetizenBroker::findFans(std::string netizenId)
     std::vector<std::string> fansIds;
     sql::ResultSet* res=RelationalBroker::query(com);
     while (res->next()) {
-         fansIds.push_back(std::to_string(res->getInt(1)));
+         fansIds.push_back(std::to_string(res->getUInt(1)));
     }
 
     std::vector<std::string> newCacheFans=findNewFans(netizenId);
@@ -64,11 +64,11 @@ std::vector<std::string> NetizenBroker::findFans(std::string netizenId)
 std::vector<std::string> NetizenBroker::findConcereds(std::string netizenId)
 {
 
-    std::string com="select R_id from Relation where N_Fan_id="+netizenId;
+    std::string com="select N_id from Relation where N_Fan_id="+netizenId;
     std::vector<std::string> concernedIds;
     sql::ResultSet* res=RelationalBroker::query(com);
     while (res->next()) {
-         concernedIds.push_back(std::to_string(res->getInt(1)));
+         concernedIds.push_back(std::to_string(res->getUInt(1)));
     }
 
     std::vector<std::string> newCacheConcerneds=findNewFans(netizenId);
@@ -84,7 +84,7 @@ std::vector<std::string> NetizenBroker::findComments(std::string netizenId)
     std::vector<std::string> commentIds;
     sql::ResultSet* res=RelationalBroker::query(com);
     while (res->next()) {
-         commentIds.push_back(std::to_string(res->getInt(1)));
+         commentIds.push_back(std::to_string(res->getUInt(1)));
     }
 
     std::vector<std::string> newCacheComments=CommentBroker::getInstance()->findNewComments(netizenId);
@@ -125,7 +125,7 @@ Netizen &NetizenBroker::retrieveNetizen(std::string netizenId)
     sql::ResultSet* res=RelationalBroker::query(com);
     // Loop through and print results
     while (res->next()) {
-        id=std::to_string(res->getInt(1));
+        id=std::to_string(res->getUInt(1));
         nickName=res->getString(2);
     }
     Netizen netizen(id,nickName,findJottings(id),findFans(id),findConcereds(id),findComments(id));
@@ -134,6 +134,11 @@ Netizen &NetizenBroker::retrieveNetizen(std::string netizenId)
     m_oldClean.insert({netizen.id(),netizen});
 
     return m_oldClean.at(netizen.id()) ;
+}
+
+void NetizenBroker::addFollowRelation(std::string nId, std::string fanId)
+{
+    m_newFollow.insert({nId,fanId});
 }
 
 Netizen *NetizenBroker::inCache(std::string id)

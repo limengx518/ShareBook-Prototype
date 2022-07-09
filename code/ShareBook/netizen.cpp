@@ -14,6 +14,8 @@
 #include "jottingnotification.h"
 #include "messagesequence.h"
 #include "snowflakeidworker.h"
+#include "material.h"
+#include "materialbroker.h"
 
 using json = nlohmann::json;
 
@@ -193,23 +195,36 @@ bool Netizen::comment(const std::string content, const std::string jottingId)
     return true;
 }
 
-bool Netizen::publishJotting(std::string content)
+bool Netizen::publishJotting(nlohmann::json jotting_json)
 {
-    std::vector<std::string> vec;
+
+    std::vector<std::string> comments;
+    std::vector<Material> materials;
+    std::vector<std::string> materialsId;
     //获取创建时间
     std::string time=getTime();
-
     //创建jotting的id
-    unsigned int jotting_id=Singleton<IdWorker>::instance().nextId();
+    std::string jotting_id=std::to_string((unsigned int)Singleton<IdWorker>::instance().nextId());
+
+    auto content=jotting_json["content"].get<std::string>();
+    for(auto& material:jotting_json["materials"]){
+        std::string path=material.get<std::string>();
+        std::string id=std::to_string((unsigned int)Singleton<IdWorker>::instance().nextId());
+        materialsId.push_back(id);
+        materials.push_back(Material(id,jotting_id,path));
+    }
 
     //创建笔记对象
-    Jotting* jotting=new Jotting(std::to_string(jotting_id),content,time,id(),vec,vec);
+    Jotting jotting(jotting_id,content,time,id(),materialsId,comments);
 
-     //将笔记对象存入newCleanCache缓存
-    JottingBroker::getInstance()->addJotting(*jotting);
+    //建立netizen和jotting的联系
+    _jottings.insert(std::pair<std::string,JottingProxy>(jotting.id(),JottingProxy(jotting.id())));
 
-    //建立netizen和comment的联系
-    _jottings.insert(std::pair<std::string,JottingProxy>(jotting->id(),JottingProxy(jotting->id())));
+    //将笔记对象和material对象存入newCleanCache缓存
+    JottingBroker::getInstance()->addJotting(jotting);
+    for(auto &material:materials){
+        MaterialBroker::getInstance()->addMaterial(material);
+    }
 
 
     //发送给所有粉丝“发布笔记”的消息
@@ -217,7 +232,7 @@ bool Netizen::publishJotting(std::string content)
     //创建jotting的id
     unsigned int message_id=Singleton<IdWorker>::instance().nextId();
     //将JottingNotification加入消息队列中
-    MessageSequence::getInstance()->pushNotification(JottingNotification(std::to_string(message_id),id(),_fans,message_content,time,jotting->id()));
+    MessageSequence::getInstance()->pushNotification(JottingNotification(std::to_string(message_id),id(),_fans,message_content,time,jotting.id()));
 
     return true;
 }
@@ -235,6 +250,20 @@ bool Netizen::isOnline()
 void Netizen::setOnline(bool online)
 {
     m_online=online;
+}
+
+void Netizen::followNetizen(std::string concernedId)
+{
+    //建立关联
+    _concerneds.insert(std::pair<std::string,NetizenProxy>(concernedId,NetizenProxy(concernedId)));
+
+    //找到所关注的人
+    Netizen concerned=NetizenBroker::getInstance()->findById(concernedId);
+    //建立关联(涨粉)
+    concerned.growFan(id());
+
+    //存入newCleanCache
+    NetizenBroker::getInstance()->addFollowRelation(concernedId,id());
 }
 
 nlohmann::json Netizen::scanMessages()
@@ -266,5 +295,10 @@ nlohmann::json Netizen::checkMessage(std::string messageId)
 
     //返回笔记的详情内容
     return checkOneJotting(jottingId);
+}
+
+void Netizen::growFan(std::string id)
+{
+    _fans.insert({id,NetizenProxy(id)});
 }
 
