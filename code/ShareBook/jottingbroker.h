@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 #include <set>
-#include <jottinginterface.h>
-#include <jotting.h>
+#include "jottinginterface.h"
+#include "jotting.h"
 #include "relationalbroker.h"
 #include <vector>
 #include "jottingproxy.h"

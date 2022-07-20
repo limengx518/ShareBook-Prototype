@@ -1,9 +1,9 @@
 #ifndef RELATIONALBROKER_H
 #define RELATIONALBROKER_H
 #include <mariadb/conncpp.hpp>
-#include<boost/asio.hpp>
-#include<boost/date_time/posix_time/posix_time.hpp>
-#include<boost/bind/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/bind/bind.hpp>
 
 class Jotting;
 class Netizen;
